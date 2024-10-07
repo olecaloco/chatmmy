@@ -1,0 +1,258 @@
+import { Messages } from "@/components/app/messages";
+import { Suggestions } from "@/components/app/suggestions";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useAuthContext } from "@/helpers/authContext";
+import { fetchPreviousMessages, getChatSnapshot, getEmotes, sendMessageToDb } from "@/lib/api";
+import { Emote_API, Message } from "@/models";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { DocumentData } from "firebase/firestore";
+import { Send } from "lucide-react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useDebouncedCallback } from "use-debounce";
+import { ReplyingTo } from "@/components/app/replyingTo";
+
+export const Route = createFileRoute("/")({
+    beforeLoad: ({ context, location }) => {
+        if (!context.user.user) {
+            throw redirect({
+                to: "/signin",
+                search: {
+                    redirect: location.href,
+                },
+            });
+        }
+    },
+    component: Index,
+});
+
+function Index() {
+    const { user } = useAuthContext();
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    const [emotes, setEmotes] = useState<Emote_API[]>([]);
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [firstMessageDoc, setFirstMessageDoc] = useState<DocumentData | null>(null);
+    const [loadingPrevious, setLoadingPrevious] = useState(false);
+
+    // Suggestion
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [incompleteEmote, setIncompleteEmote] = useState("");
+    const [emoteQueue, setEmoteQueue] = useState<{[key: string]: string}[]>([]);
+
+    // Replying
+    const [replyingTo, setReplyingTo] = useState<Message | null>(null);
+
+    const navigate = useNavigate();
+
+    const suggestions = useMemo(
+        () =>
+            emotes.filter((e) => {
+                return e.name
+                    .toLowerCase()
+                    .includes(incompleteEmote.toLowerCase());
+            }),
+        [incompleteEmote]
+    );
+
+    useEffect(() => {
+        if (user === null) navigate({ to: "/signin" });
+    }, [navigate, user]);
+
+    useEffect(() => {
+        getEmotes((response) => {
+            setEmotes(response.emotes);
+        });
+    }, []);
+
+    useEffect(() => {
+        const unsub = getChatSnapshot((snapshot) => {
+
+            const _messages: Message[] = [];
+
+            snapshot.docChanges().forEach(change => {
+                if (change.type === "added") {
+                    _messages.push(change.doc.data());
+                }
+            });
+
+            if (!snapshot.empty) {
+                setFirstMessageDoc(p => {
+                    if (p) return p;
+                    return snapshot.docs[snapshot.size - 1];
+                });
+            }
+
+            setMessages(m => [..._messages, ...m]);
+        });
+
+        return unsub;
+    }, []);
+
+    const processContent = async (value: string) => {
+        let _emoteQueue = [...emoteQueue];
+        let content = value.replace(/\n/g, '\\n');
+        const now = new Date();
+
+        const words = content.trim().split(/\s+/);
+        if (words.length === 1) {
+            const key = words[0]
+            const _singleQueue = emoteQueue.reduce((acc, emote) => ({...acc, ...emote}), {});
+            if (_singleQueue[key]) {
+                const url = _singleQueue[key].replace('1x', '2x');
+                _emoteQueue = [{[key]: url}];
+            }
+        }
+
+        const data: any = {
+            content: content.trim(),
+            senderId: user?.uid,
+            createdAt: now,
+            emoteUrls: _emoteQueue,
+        }
+
+        if (replyingTo) {
+            data.replyingTo = replyingTo.id;
+            data.replyingToContent = replyingTo.content;
+            data.replyingToEmoteUrls = replyingTo.emoteUrls;
+        }        
+
+        if (user) {
+            try {
+                sendMessageToDb(data);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        
+        setEmoteQueue([]);
+        setReplyingTo(null);
+
+        if (inputRef.current) {
+            inputRef.current.value = "";
+            inputRef.current.focus();
+        }
+    };
+
+    const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+
+        if (inputRef.current) {
+            setShowSuggestions(false);
+            const value = inputRef.current.value;
+
+            if (value) {
+                processContent(value);
+            } 
+        }
+    };
+
+    const onSuggestionClick = (emoteName: string) => {
+        if (inputRef.current) {
+            const text = inputRef.current.value;
+            const newText = text.replace(/:(\w+)(?!:)(?<!:\w+:)/g, `${emoteName}`);
+            inputRef.current.value = newText;
+            setShowSuggestions(false);
+
+            const emote = emotes.find((e) => e.name === emoteName);
+
+            if (emote) {
+                const { host } = emote.data;
+                const url = host.url + "/" + host.files[1].name;
+                setEmoteQueue([...emoteQueue, { [emoteName]: url }]);
+            }
+
+            inputRef.current.focus();
+        }
+    };
+
+    
+
+    const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {    
+        const text = event.target.value;
+
+        // Split text into words and potential emote parts
+        const parts = text
+            .split(/\s+/)
+            .filter((part) => part !== "" || part !== undefined);
+
+        // Find the last potential emote part
+        const lastEmotePart = parts.reduceRight((acc, part) => {
+            if (part.startsWith(":") && !part.endsWith(":") && !/^:\w+:$/.test(part)) {
+                return part.slice(1);
+            }
+            return acc;
+        }, "");
+
+        if (lastEmotePart) {
+            if (!showSuggestions) {
+                setShowSuggestions(true);
+            }
+
+            setIncompleteEmote(lastEmotePart);
+        } else {
+            setShowSuggestions(false);
+        }
+    };
+
+    const debounced = useDebouncedCallback(handleInput, 250);
+
+    const onReply = (message: Message) => {
+        setReplyingTo(message);
+        inputRef.current?.focus();
+    }
+
+    const handleLoadMore = async () => {
+        if (!firstMessageDoc) return;
+
+        setLoadingPrevious(true);
+
+        const documents = await fetchPreviousMessages(firstMessageDoc);
+
+        if (!documents.empty) {
+            const _messages = documents.docs.map(d => d.data());
+            setFirstMessageDoc(documents.docs[documents.size - 1]);
+            setMessages(m => [...m, ..._messages]);
+        }
+
+        setLoadingPrevious(false);
+    }
+
+    if (!user) return null;
+
+
+    return (
+        <>
+            <Messages
+                messages={messages}
+                onReply={onReply}
+                handleLoadMore={handleLoadMore}
+                loadMoreLoading={loadingPrevious}
+            />
+
+            <form className="relative" onSubmit={onSubmit}>
+                {showSuggestions && suggestions.length > 0 && (
+                    <Suggestions
+                        suggestions={suggestions}
+                        onSuggestionClick={onSuggestionClick}
+                    />
+                )}
+
+                <ReplyingTo replyingTo={replyingTo} setReplyingTo={setReplyingTo} />
+
+                <div className="flex gap-2 p-4 pb-10 border-t">
+                    <Input
+                        className="bg-muted flex-1 rounded-full"
+                        ref={inputRef}
+                        autoComplete="off"
+                        placeholder="Message"
+                        onChange={(e) => debounced(e)}
+                    />
+                    <Button className="rounded-full" title="Send" size="icon">
+                        <Send />
+                    </Button>
+                </div>
+            </form>
+        </>
+    );
+}
