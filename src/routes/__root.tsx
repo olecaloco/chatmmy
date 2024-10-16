@@ -20,7 +20,6 @@ import { EllipsisVertical } from "lucide-react";
 import { User } from "firebase/auth";
 import { Switch } from "@/components/ui/switch";
 import { setupNotifications } from "@/firebase";
-import { useEffect } from "react";
 import { getEmotes } from "@/lib/api";
 
 interface MyRouterContext {
