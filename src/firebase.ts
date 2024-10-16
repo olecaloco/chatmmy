@@ -40,12 +40,12 @@ export const setupNotifications = async () => {
     }
 };
 
-if (import.meta.env.DEV) {
-    const { connectAuthEmulator } = await import("firebase/auth");
-    const { connectFirestoreEmulator } = await import("firebase/firestore");
-    const { connectFunctionsEmulator } = await import("firebase/functions");
+// if (import.meta.env.DEV) {
+//     const { connectAuthEmulator } = await import("firebase/auth");
+//     const { connectFirestoreEmulator } = await import("firebase/firestore");
+//     const { connectFunctionsEmulator } = await import("firebase/functions");
 
-    connectAuthEmulator(auth, "http://localhost:9099", { disableWarnings: true });
-    connectFirestoreEmulator(db, "localhost", 8080);
-    connectFunctionsEmulator(functions, "127.0.0.1", 5001);
-}
+//     connectAuthEmulator(auth, "http://localhost:9099", { disableWarnings: true });
+//     connectFirestoreEmulator(db, "localhost", 8080);
+//     connectFunctionsEmulator(functions, "127.0.0.1", 5001);
+// }

@@ -1,4 +1,5 @@
 import { type ClassValue, clsx } from "clsx"
+import { format, isToday } from "date-fns";
 import { twMerge } from "tailwind-merge"
 
 export function cn(...inputs: ClassValue[]) {
@@ -19,3 +20,13 @@ export function isValidHttpUrl(url: string) {
     return false;
   }
 }
+
+export const formatTimestamp = (date?: Date): string => {
+  if (!date) return "";
+
+  if (isToday(date)) {
+      return format(date, "hh:mm a");
+  } else {
+      return format(date, "MMM d, hh:mm a");
+  }
+};

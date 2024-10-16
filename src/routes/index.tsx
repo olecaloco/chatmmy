@@ -29,25 +29,21 @@ export const Route = createFileRoute("/")({
 function Index() {
     const { user } = useAuthContext();
     const inputRef = useRef<HTMLInputElement>(null);
+    const emotesRef = useRef<Emote_API[]>([]);
 
-    const [emotes, setEmotes] = useState<Emote_API[]>([]);
     const [messages, setMessages] = useState<Message[]>([]);
     const [firstMessageDoc, setFirstMessageDoc] = useState<DocumentData | null>(null);
     const [loadingPrevious, setLoadingPrevious] = useState(false);
-
-    // Suggestion
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [incompleteEmote, setIncompleteEmote] = useState("");
     const [emoteQueue, setEmoteQueue] = useState<{[key: string]: string}[]>([]);
-
-    // Replying
     const [replyingTo, setReplyingTo] = useState<Message | null>(null);
 
     const navigate = useNavigate();
 
     const suggestions = useMemo(
         () =>
-            emotes.filter((e) => {
+            emotesRef.current.filter((e) => {
                 return e.name
                     .toLowerCase()
                     .includes(incompleteEmote.toLowerCase());
@@ -60,9 +56,16 @@ function Index() {
     }, [navigate, user]);
 
     useEffect(() => {
-        getEmotes((response) => {
-            setEmotes(response.emotes);
-        });
+        const storedEmotes = window.localStorage.getItem('emotes');
+        if (!storedEmotes) {
+            getEmotes((response) => {
+                window.localStorage.setItem("emotes", JSON.stringify(response.emotes))
+                emotesRef.current = response.emotes;                
+            });
+        } else {
+            const parsedEmotes = JSON.parse(storedEmotes);
+            emotesRef.current = parsedEmotes;
+        }
     }, []);
 
     useEffect(() => {
@@ -154,7 +157,7 @@ function Index() {
             inputRef.current.value = newText;
             setShowSuggestions(false);
 
-            const emote = emotes.find((e) => e.name === emoteName);
+            const emote = suggestions.find((e) => e.name === emoteName);
 
             if (emote) {
                 const { host } = emote.data;

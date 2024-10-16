@@ -1,8 +1,9 @@
 import { Emote_API } from "@/models";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "../ui/button";
+import { memo } from "react";
 
-export const Suggestions = ({
+export const Suggestions = memo(({
     suggestions,
     onSuggestionClick,
 }: {
@@ -37,4 +38,10 @@ export const Suggestions = ({
             </ScrollArea>
         </div>
     );
-};
+}, (prev, next) => {
+    if (prev.suggestions.length === next.suggestions.length) {
+        return true;
+    } else {
+        return false;
+    }
+});

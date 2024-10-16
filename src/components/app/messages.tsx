@@ -2,11 +2,11 @@ import { Message } from "@/models";
 import { MessageItem } from "./messageItem";
 import { Button } from "../ui/button";
 import { ChevronDown } from "lucide-react";
-import { useRef, useState } from "react";
+import { memo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useDebouncedCallback } from "use-debounce";
 
-export const Messages = ({
+export const Messages = memo(({
     messages,
     loadMoreLoading,
     onReply,
@@ -61,7 +61,13 @@ export const Messages = ({
             </div>
         </div>
     );
-};
+}, (prev, next) => {
+    if (prev.messages.length === next.messages.length) { 
+        return true;
+    } else {
+        return false;
+    }
+});
 
 const LoadMoreButton = ({
     handleLoadMore,

@@ -1,22 +1,11 @@
 import { useAuthContext } from "@/helpers/authContext";
 import { normalizeMessageContent } from "@/lib/normalizeMessage";
-import { cn, isValidHttpUrl } from "@/lib/utils";
+import { cn, formatTimestamp, isValidHttpUrl } from "@/lib/utils";
 import { Message } from "@/models";
-import { format, isToday } from "date-fns";
 import { Button } from "../ui/button";
 import { Reply } from "lucide-react";
 import { useSpring, animated } from "@react-spring/web";
 import { useDrag } from "@use-gesture/react";
-
-export const formatTimestamp = (date?: Date): string => {
-    if (!date) return "";
-
-    if (isToday(date)) {
-        return format(date, "hh:mm a");
-    } else {
-        return format(date, "MMM d, hh:mm a");
-    }
-};
 
 const ReplyContent = ({
     message,
@@ -192,7 +181,7 @@ export const MessageItem = ({
                 right: 20,
             },
             filterTaps: true,
-            rubberband: 0.1,
+            rubberband: true
         }
     );
 
@@ -235,19 +224,21 @@ export const MessageItem = ({
                     )}
                     <MessageContent message={message} userOwnsMessage={userOwnsMessage} />
                 </animated.div>
-                {shouldShowTime && (
-                    <span
-                        className={cn(
-                            "block text-xs text-muted-foreground font-bold mt-1 mb-4",
-                            {
-                                "text-right": userOwnsMessage,
-                            }
-                        )}
-                    >
-                        {formatTimestamp(message.createdAt)}
-                    </span>
-                )}
+                {shouldShowTime && <MessageTimestamp userOwnsMessage={userOwnsMessage} createdAt={message.createdAt} />}
             </div>
         </div>
     );
 };
+
+const MessageTimestamp = ({ userOwnsMessage, createdAt }: { userOwnsMessage: boolean; createdAt?: Date }) => (
+    <span
+        className={cn(
+            "block text-xs text-muted-foreground font-bold mt-1 mb-4",
+            {
+                "text-right": userOwnsMessage,
+            }
+        )}
+    >
+        {formatTimestamp(createdAt)}
+    </span>
+)

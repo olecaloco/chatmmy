@@ -20,6 +20,8 @@ import { EllipsisVertical } from "lucide-react";
 import { User } from "firebase/auth";
 import { Switch } from "@/components/ui/switch";
 import { setupNotifications } from "@/firebase";
+import { useEffect } from "react";
+import { getEmotes } from "@/lib/api";
 
 interface MyRouterContext {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -33,6 +35,13 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 
 function RootComponent() {
     const { user, userData } = useAuthContext();
+
+    const handleRefreshEmotes = () => {
+        getEmotes((response) => {
+            window.localStorage.setItem("emotes", JSON.stringify(response.emotes));
+            window.location.reload();
+        });
+    };
 
     return (
         <div className="h-dvh flex flex-col">
@@ -58,6 +67,10 @@ function RootComponent() {
                                 <DropdownMenuLabel>
                                     <NotificationTrigger userData={userData} />
                                 </DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={handleRefreshEmotes}>
+                                    Refresh Emotes
+                                </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem
                                     onClick={signOut}
