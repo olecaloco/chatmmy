@@ -118,7 +118,7 @@ const ScrollToBottomButton = ({
 }) => (
     <Button
         className={cn(
-            "absolute bottom-0 left-1/2 -translate-x-1/2 z-10 rounded-full bg-blue-500 hover:bg-blue-600",
+            "absolute bottom-1 left-1/2 w-7 h-7 -translate-x-1/2 z-10 rounded-full bg-blue-500 hover:bg-blue-600",
             {
                 hidden: !showButton,
             }
@@ -127,6 +127,6 @@ const ScrollToBottomButton = ({
         size="icon"
         onClick={scrollToBottom}
     >
-        <ChevronDown />
+        <ChevronDown className="w-4 h-4" />
     </Button>
 );
