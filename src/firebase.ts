@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { getMessaging, getToken } from "firebase/messaging";
 import { httpsCallable, getFunctions } from "firebase/functions";
@@ -14,9 +14,7 @@ const firebaseConfig = {
 };
 
 export const firebaseApp = initializeApp(firebaseConfig);
-export const db = initializeFirestore(firebaseApp, {
-    localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
-});
+export const db = getFirestore(firebaseApp);
 export const auth = getAuth(firebaseApp);
 export const messaging = getMessaging(firebaseApp);
 export const functions = getFunctions(firebaseApp, "asia-southeast1");
@@ -40,12 +38,12 @@ export const setupNotifications = async () => {
     }
 };
 
-// if (import.meta.env.DEV) {
-//     const { connectAuthEmulator } = await import("firebase/auth");
-//     const { connectFirestoreEmulator } = await import("firebase/firestore");
-//     const { connectFunctionsEmulator } = await import("firebase/functions");
+if (import.meta.env.DEV) {
+    const { connectAuthEmulator } = await import("firebase/auth");
+    const { connectFirestoreEmulator } = await import("firebase/firestore");
+    const { connectFunctionsEmulator } = await import("firebase/functions");
 
-//     connectAuthEmulator(auth, "http://localhost:9099", { disableWarnings: true });
-//     connectFirestoreEmulator(db, "localhost", 8080);
-//     connectFunctionsEmulator(functions, "127.0.0.1", 5001);
-// }
+    connectAuthEmulator(auth, "http://localhost:9099", { disableWarnings: true });
+    connectFirestoreEmulator(db, "localhost", 8080);
+    connectFunctionsEmulator(functions, "127.0.0.1", 5001);
+}
