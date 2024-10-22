@@ -15,7 +15,7 @@ export function ModeToggle() {
   }
 
   return (
-    <div className="flex items-center space-between">
+    <div className="flex gap-2 items-center space-between">
       <span className="flex-1">Dark Mode</span>
       <Switch checked={isDarkMode} onCheckedChange={onCheckedChange} />
     </div>
