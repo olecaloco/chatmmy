@@ -161,7 +161,7 @@ function Index() {
 
             if (emote) {
                 const { host } = emote.data;
-                const url = host.url + "/" + host.files[1].name;
+                const url = host.url + "/" + "1x.webp";
                 setEmoteQueue([...emoteQueue, { [emoteName]: url }]);
             }
 

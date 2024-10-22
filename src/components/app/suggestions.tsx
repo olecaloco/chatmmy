@@ -28,7 +28,7 @@ export const Suggestions = memo(({
                     >
                         <span className="flex items-center gap-2">
                             <img
-                                src={`${s.data.host.url}/${s.data.host.files[1].name}`}
+                                src={`${s.data.host.url}/1x.webp`}
                                 alt={s.name}
                             />
                             :{s.name}:
