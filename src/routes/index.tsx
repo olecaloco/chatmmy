@@ -123,6 +123,14 @@ function Index() {
         if (user) {
             try {
                 sendMessageToDb(data);
+                fetch(`https://ntfy.sh/${user.uid}`, {
+                    method: "POST",
+                    body: content.trim(),
+                    headers: {
+                        "Title": "Chatmmy",
+                        "Click": "https://chatmmy-edcbc.web.app"
+                    }
+                })
             } catch (error) {
                 console.error(error);
             }
