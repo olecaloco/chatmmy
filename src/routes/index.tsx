@@ -128,6 +128,7 @@ function Index() {
                     body: content.trim(),
                     headers: {
                         "Title": "Chatmmy",
+                        "Icon": "https://chatmmy-fullstack.onrender.com/pwa-64x64.png",
                         "Click": "https://chatmmy-edcbc.web.app"
                     }
                 })
