@@ -17,30 +17,37 @@ export const ReplyingTo = ({
             config: { duration: 100, easing: easings.easeOutBack },
         },
         enter: {
-            maxHeight: 56,
+            maxHeight: 72,
             config: { duration: 300, easing: easings.easeOutBack },
         },
         leave: { maxHeight: 0, config: { duration: 500 } },
         key: (item: Message | null) => (item ? item.id : null),
-    }); 
+    });
 
     return transitions(
         (style, item) =>
             item && (
                 <animated.div style={style} className="overflow-hidden">
                     <div className="flex items-center justify-between px-4 py-2 mt-2 bg-muted overflow-hidden">
-                        <div className="flex-1 truncate">
+                        <div className="flex items-center flex-1 truncate">
                             <span className="text-xs font-bold mr-2">
                                 Replying To:
                             </span>
                             <span className="text-sm">
-                                {
-                                    normalizeMessageContent(
-                                        replyingTo?.content ?? "",
-                                        replyingTo?.replyingToEmoteUrls,
-                                        true,
-                                    )
-                                }
+                                {(replyingTo?.media &&
+                                    replyingTo?.media.length > 0) && (
+                                        <img
+                                            className="w-12 h-12"
+                                            src={replyingTo.media[0]}
+                                            alt=""
+                                        />
+                                    )}
+
+                                {(!replyingTo?.media || replyingTo.media.length < 1) && normalizeMessageContent(
+                                    replyingTo?.content ?? "",
+                                    replyingTo?.replyingToEmoteUrls,
+                                    true
+                                )}
                             </span>
                         </div>
                         <Button

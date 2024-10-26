@@ -9,23 +9,44 @@ import { useDrag } from "@use-gesture/react";
 
 const ReplyContent = ({
     message,
+    media,
     emotes,
     userOwnsMessage,
 }: {
-    message: string;
+    message?: string;
+    media?: string[];
     emotes?: Message["emoteUrls"];
     userOwnsMessage: boolean;
-}) => (
-    <div
-        className={cn("rounded-lg px-3 py-2 text-sm mb-2 border-l-4", {
-            "border-l-white bg-gray-200 dark:bg-gray-700": !userOwnsMessage,
-            "border-l-blue-500 bg-gray-700 dark:bg-gray-200": userOwnsMessage,            
-        })}
-    >
-        <div className="mb-2 font-bold text-xs">Replied To:</div>
-        {normalizeMessageContent(message, emotes, false, userOwnsMessage)}
-    </div>
-);
+}) => {
+    if (!message && media && media.length > 0) {
+        return (
+            <div
+                className={cn("rounded-lg px-3 py-2 text-sm mb-2 border-l-4", {
+                    "border-l-white bg-gray-200 dark:bg-gray-700": !userOwnsMessage,
+                    "border-l-blue-500 bg-gray-700 dark:bg-gray-200":
+                        userOwnsMessage,
+                })}
+            >
+                <div className="mb-2 font-bold text-xs">Replying To:</div>
+                <img className="w-32 h-52 rounded" src={media[0]} alt="" />
+            </div>
+        )
+    }
+
+    return (
+        <div
+            className={cn("rounded-lg px-3 py-2 text-sm mb-2 border-l-4", {
+                "border-l-white bg-gray-200 dark:bg-gray-700": !userOwnsMessage,
+                "border-l-blue-500 bg-gray-700 dark:bg-gray-200":
+                    userOwnsMessage,
+            })}
+        >
+            <div className="mb-2 font-bold text-xs">Replying To:</div>
+            {(media && media.length > 0) && <a href={media[0]} target="_blank"><img className="block mb-2 w-32 h-52 object-cover rounded" src={media[0]} alt="" /></a>}
+            {normalizeMessageContent(message ?? "", emotes, false, userOwnsMessage)}
+        </div>
+    );
+};
 
 const MessageItemReplyButton = ({
     message,
@@ -53,8 +74,15 @@ const MessageItemReplyButton = ({
     </Button>
 );
 
-const MessageContent = ({ message, userOwnsMessage }: { message: Message, userOwnsMessage: boolean }) => {
+const MessageContent = ({
+    message,
+    userOwnsMessage,
+}: {
+    message: Message;
+    userOwnsMessage: boolean;
+}) => {
     if (
+        message.content &&
         message.replyingTo &&
         message.content.split(/ /).length == 1 &&
         userOwnsMessage &&
@@ -62,11 +90,23 @@ const MessageContent = ({ message, userOwnsMessage }: { message: Message, userOw
         message.emoteUrls.length > 0
     ) {
         return (
-            <div className="text-end">{normalizeMessageContent(message.content, message.emoteUrls, false, userOwnsMessage)}</div>
+            <div className="text-end">
+                {normalizeMessageContent(
+                    message.content,
+                    message.emoteUrls,
+                    false,
+                    userOwnsMessage
+                )}
+            </div>
         );
     }
 
-    return normalizeMessageContent(message.content, message.emoteUrls, false, userOwnsMessage);
+    return normalizeMessageContent(
+        message.content,
+        message.emoteUrls,
+        false,
+        userOwnsMessage
+    );
 };
 
 export const MessageItem = ({
@@ -181,7 +221,7 @@ export const MessageItem = ({
                 right: 20,
             },
             filterTaps: true,
-            rubberband: true
+            rubberband: true,
         }
     );
 
@@ -209,28 +249,52 @@ export const MessageItem = ({
                         "px-3 py-2 text-sm touch-none [overflow-wrap:anywhere]",
                         roundedClass,
                         {
+                            "p-0": !message.content,
                             "bg-primary": userOwnsMessage && shouldShowBG,
                             "ml-auto text-primary-foreground": userOwnsMessage,
                             "bg-muted": !userOwnsMessage && shouldShowBG,
                         }
                     )}
                 >
-                    {message.replyingToContent && (
+                    {message.media && message.media.length > 0 && (
+                        <a href={message.media[0]} target="_blank">
+                            <img
+                                className="block mb-2 w-32 h-52 object-cover rounded"
+                                src={message.media[0]}
+                            />
+                        </a>
+                    )}
+                    {(message.replyingToContent || message.replyingToMedia) && (
                         <ReplyContent
                             message={message.replyingToContent}
+                            media={message.replyingToMedia}
                             emotes={message.replyingToEmoteUrls}
                             userOwnsMessage={userOwnsMessage}
                         />
                     )}
-                    <MessageContent message={message} userOwnsMessage={userOwnsMessage} />
+                    <MessageContent
+                        message={message}
+                        userOwnsMessage={userOwnsMessage}
+                    />
                 </animated.div>
-                {shouldShowTime && <MessageTimestamp userOwnsMessage={userOwnsMessage} createdAt={message.createdAt} />}
+                {shouldShowTime && (
+                    <MessageTimestamp
+                        userOwnsMessage={userOwnsMessage}
+                        createdAt={message.createdAt}
+                    />
+                )}
             </div>
         </div>
     );
 };
 
-const MessageTimestamp = ({ userOwnsMessage, createdAt }: { userOwnsMessage: boolean; createdAt?: Date }) => (
+const MessageTimestamp = ({
+    userOwnsMessage,
+    createdAt,
+}: {
+    userOwnsMessage: boolean;
+    createdAt?: Date;
+}) => (
     <span
         className={cn(
             "block text-xs text-muted-foreground font-bold mt-1 mb-4",
@@ -241,4 +305,4 @@ const MessageTimestamp = ({ userOwnsMessage, createdAt }: { userOwnsMessage: boo
     >
         {formatTimestamp(createdAt)}
     </span>
-)
+);

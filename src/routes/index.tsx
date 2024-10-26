@@ -8,6 +8,7 @@ import {
     getChatSnapshot,
     getEmotes,
     sendMessageToDb,
+    uploadFile,
 } from "@/lib/api";
 import { Emote_API, Message } from "@/models";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
@@ -109,7 +110,7 @@ function Index() {
         return unsub;
     }, []);
 
-    const processContent = async (value: string) => {
+    const processValueOnly = async (value: string) => {
         let _emoteQueue = [...emoteQueue];
         let content = value.replace(/\n/g, "\\n");
         const now = new Date();
@@ -132,52 +133,207 @@ function Index() {
             senderId: user?.uid,
             createdAt: now,
             emoteUrls: _emoteQueue,
+            media: [],
         };
 
         if (replyingTo) {
             data.replyingTo = replyingTo.id;
             data.replyingToContent = replyingTo.content;
             data.replyingToEmoteUrls = replyingTo.emoteUrls;
+            if (replyingTo.media) {
+                data.replyingToMedia = replyingTo.media;
+            }
         }
 
-        if (user) {
-            try {
-                sendMessageToDb(data).then(() => {
-                    fetch(`https://ntfy.sh/${user.uid}`, {
-                        method: "POST",
-                        body: content.trim(),
-                        headers: {
-                            Title: "Chatmmy",
-                            Icon: "https://chatmmy-fullstack.onrender.com/pwa-64x64.png",
-                            Click: "https://chatmmy-edcbc.web.app",
-                        },
-                    });
+        try {
+            sendMessageToDb(data).then(() => {
+                fetch(`https://ntfy.sh/${user?.uid}`, {
+                    method: "POST",
+                    body: content.trim(),
+                    headers: {
+                        Title: "Chatmmy",
+                        Icon: "https://chatmmy-fullstack.onrender.com/pwa-64x64.png",
+                        Click: "https://chatmmy-edcbc.web.app",
+                    },
                 });
-            } catch (error) {
-                console.error(error);
+            });
+        } catch (error) {
+            console.error(error);
+        }
+
+        setEmoteQueue([]);
+        setReplyingTo(null);
+        setFilePreviews([]);
+
+        if (inputRef.current) {
+            inputRef.current.value = "";
+            inputRef.current.focus();
+        }
+
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+        }
+    };
+
+    const processFilesOnly = async (files: FileList) => {
+        const data: any = {
+            content: "",
+            senderId: user?.uid,
+            createdAt: new Date(),
+            emoteUrls: [],
+            media: [],
+        };
+
+        if (replyingTo) {
+            data.replyingTo = replyingTo.id;
+            data.replyingToContent = replyingTo.content;
+            data.replyingToEmoteUrls = replyingTo.emoteUrls;
+            if (replyingTo.media) {
+                data.replyingToMedia = replyingTo.media;
+            }
+
+            console.log('test')
+        }
+
+        if (files.length > 0) {
+            uploadFile(files[0]).then((url) => {
+                data.media = [url];
+
+                if (user) {
+                    try {
+                        sendMessageToDb(data).then(() => {
+                            fetch(`https://ntfy.sh/${user.uid}`, {
+                                method: "POST",
+                                body: "A new image has been posted",
+                                headers: {
+                                    Title: "Chatmmy",
+                                    Icon: "https://chatmmy-fullstack.onrender.com/pwa-64x64.png",
+                                    Click: "https://chatmmy-edcbc.web.app",
+                                },
+                            });
+                        });
+                    } catch (error) {
+                        console.error(error);
+                    }
+                }
+            });
+        }
+
+        setEmoteQueue([]);
+        setReplyingTo(null);
+        setFilePreviews([]);
+
+        if (inputRef.current) {
+            inputRef.current.value = "";
+            inputRef.current.focus();
+        }
+
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+        }
+    };
+
+    const processContent = async (value: string, files: FileList) => {
+        let _emoteQueue = [...emoteQueue];
+        let content = value.replace(/\n/g, "\\n");
+        const now = new Date();
+
+        const words = content.trim().split(/\s+/);
+        if (words.length === 1) {
+            const key = words[0];
+            const _singleQueue = emoteQueue.reduce(
+                (acc, emote) => ({ ...acc, ...emote }),
+                {}
+            );
+            if (_singleQueue[key]) {
+                const url = _singleQueue[key].replace("1x", "2x");
+                _emoteQueue = [{ [key]: url }];
+            }
+        }
+
+        const data: any = {
+            content: content.trim(),
+            senderId: user?.uid,
+            createdAt: now,
+            emoteUrls: _emoteQueue,
+            media: [],
+        };
+
+        if (replyingTo) {
+            data.replyingTo = replyingTo.id;
+            data.replyingToContent = replyingTo.content;
+            data.replyingToEmoteUrls = replyingTo.emoteUrls;
+            if (replyingTo.media) {
+                data.replyingToMedia = replyingTo.media;
+            }
+        }
+
+        if (files.length > 0) {
+            uploadFile(files[0]).then((url) => {
+                data.media = [url];
+
+                if (user) {
+                    try {
+                        sendMessageToDb(data).then(() => {
+                            fetch(`https://ntfy.sh/${user.uid}`, {
+                                method: "POST",
+                                body: content.trim(),
+                                headers: {
+                                    Title: "Chatmmy",
+                                    Icon: "https://chatmmy-fullstack.onrender.com/pwa-64x64.png",
+                                    Click: "https://chatmmy-edcbc.web.app",
+                                },
+                            });
+                        });
+                    } catch (error) {
+                        console.error(error);
+                    }
+                }
+            });
+        } else {
+            if (user) {
+                try {
+                    sendMessageToDb(data).then(() => {
+                        fetch(`https://ntfy.sh/${user.uid}`, {
+                            method: "POST",
+                            body: content.trim(),
+                            headers: {
+                                Title: "Chatmmy",
+                                Icon: "https://chatmmy-fullstack.onrender.com/pwa-64x64.png",
+                                Click: "https://chatmmy-edcbc.web.app",
+                            },
+                        });
+                    });
+                } catch (error) {
+                    console.error(error);
+                }
             }
         }
 
         setEmoteQueue([]);
         setReplyingTo(null);
+        setFilePreviews([]);
 
         if (inputRef.current) {
             inputRef.current.value = "";
             inputRef.current.focus();
+        }
+
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
         }
     };
 
     const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-        if (inputRef.current) {
-            setShowSuggestions(false);
-            const value = inputRef.current.value;
+        setShowSuggestions(false);
+        const value = inputRef.current!.value;
+        const files = fileInputRef.current!.files;
 
-            if (value) {
-                processContent(value);
-            }
-        }
+        if (value && (!files || files.length === 0)) return processValueOnly(value);
+        if (!value && files && files.length > 0) return processFilesOnly(files);
+        if (value && files && files.length > 0) return processContent(value, files);
     };
 
     const onSuggestionClick = (emoteName: string) => {
@@ -260,6 +416,7 @@ function Index() {
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
+
         if (files) {
             const fileArray = Array.from(files);
             const previews = fileArray.map((file) => {
@@ -284,7 +441,7 @@ function Index() {
         if (fileInputRef.current) {
             fileInputRef.current.value = "";
         }
-    }
+    };
 
     return (
         <>
@@ -307,7 +464,11 @@ function Index() {
                     replyingTo={replyingTo}
                     setReplyingTo={setReplyingTo}
                 />
-                <FilePreview files={filePreviews} onRemoveFiles={onRemoveFiles} />
+                
+                <FilePreview
+                    files={filePreviews}
+                    onRemoveFiles={onRemoveFiles}
+                />
 
                 <div className="flex gap-2 p-4 pb-10 border-t">
                     <Button

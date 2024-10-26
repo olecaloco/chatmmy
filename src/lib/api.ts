@@ -1,4 +1,4 @@
-import { db } from "@/firebase";
+import { db, storage } from "@/firebase";
 import { Message } from "@/models";
 import {
     addDoc,
@@ -17,6 +17,7 @@ import {
     startAfter,
     Timestamp,
 } from "firebase/firestore";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 const converter: FirestoreDataConverter<Message> = {
     toFirestore: (message) => message,
@@ -68,4 +69,12 @@ export function fetchPreviousMessages(doc: DocumentData) {
 
 export function sendMessageToDb(data: Message) {
     return addDoc(collection(db, "messages"), data);
+}
+
+export async function uploadFile(file: File) {
+    const now = new Date().getTime();
+    const name = `${now}-${file.name}`
+    const imageRef = ref(storage, name);
+    const snapshot = await uploadBytes(imageRef, file);
+    return getDownloadURL(snapshot.ref);
 }

@@ -8,9 +8,11 @@ export interface Message {
     content: string;
     emoteUrls: EmoteUrl[];
     createdAt?: Date;
+    media?: string[];
     replyingTo?: string;
     replyingToContent?: string;
     replyingToEmoteUrls?: EmoteUrl[];
+    replyingToMedia?: string[];
 }
 
 export interface Emote_API {
