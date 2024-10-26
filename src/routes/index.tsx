@@ -43,6 +43,7 @@ function Index() {
     const [filePreviews, setFilePreviews] = useState<FilePreviewInterface[]>(
         []
     );
+    const [isUploading, setIsUploading] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
     const [firstMessageDoc, setFirstMessageDoc] = useState<DocumentData | null>(
         null
@@ -176,6 +177,8 @@ function Index() {
     };
 
     const processFilesOnly = async (files: FileList) => {
+        setIsUploading(true);
+
         const data: any = {
             content: "",
             senderId: user?.uid,
@@ -196,7 +199,7 @@ function Index() {
         }
 
         if (files.length > 0) {
-            uploadFile(files[0]).then((url) => {
+            await uploadFile(files[0]).then((url) => {
                 data.media = [url];
 
                 if (user) {
@@ -222,6 +225,7 @@ function Index() {
         setEmoteQueue([]);
         setReplyingTo(null);
         setFilePreviews([]);
+        setIsUploading(false);
 
         if (inputRef.current) {
             inputRef.current.value = "";
@@ -234,6 +238,8 @@ function Index() {
     };
 
     const processContent = async (value: string, files: FileList) => {
+        setIsUploading(true);
+
         let _emoteQueue = [...emoteQueue];
         let content = value.replace(/\n/g, "\\n");
         const now = new Date();
@@ -269,7 +275,7 @@ function Index() {
         }
 
         if (files.length > 0) {
-            uploadFile(files[0]).then((url) => {
+            await uploadFile(files[0]).then((url) => {
                 data.media = [url];
 
                 if (user) {
@@ -313,6 +319,7 @@ function Index() {
         setEmoteQueue([]);
         setReplyingTo(null);
         setFilePreviews([]);
+        setIsUploading(false);
 
         if (inputRef.current) {
             inputRef.current.value = "";
@@ -327,6 +334,8 @@ function Index() {
     const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
+        if (isUploading) return;
+        
         setShowSuggestions(false);
         const value = inputRef.current!.value;
         const files = fileInputRef.current!.files;
@@ -477,6 +486,7 @@ function Index() {
                         className="rounded-full"
                         title="Upload"
                         size="icon"
+                        disabled={isUploading}
                         onClick={() => fileInputRef.current?.click()}
                     >
                         <Image />
@@ -495,8 +505,9 @@ function Index() {
                         autoComplete="off"
                         placeholder="Message"
                         onChange={(e) => debounced(e)}
+                        disabled={isUploading}
                     />
-                    <Button className="rounded-full" title="Send" size="icon">
+                    <Button className="rounded-full" title="Send" size="icon" disabled={isUploading}>
                         <Send />
                     </Button>
                 </div>
