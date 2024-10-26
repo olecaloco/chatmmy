@@ -37,7 +37,7 @@ export const ReplyingTo = ({
                                 {(replyingTo?.media &&
                                     replyingTo?.media.length > 0) && (
                                         <img
-                                            className="w-12 h-12"
+                                            className="w-12 h-12 object-cover"
                                             src={replyingTo.media[0]}
                                             alt=""
                                         />

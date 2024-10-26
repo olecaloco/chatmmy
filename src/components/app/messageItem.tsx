@@ -28,7 +28,9 @@ const ReplyContent = ({
                 })}
             >
                 <div className="mb-2 font-bold text-xs">Replying To:</div>
-                <img className="w-32 h-52 rounded" src={media[0]} alt="" />
+                <a href={media[0]} target="_blank">
+                    <img className="w-32 h-52 rounded object-cover" src={media[0]} alt="" />
+                </a>
             </div>
         )
     }
