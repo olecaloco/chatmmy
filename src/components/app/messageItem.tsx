@@ -258,14 +258,6 @@ export const MessageItem = ({
                         }
                     )}
                 >
-                    {message.media && message.media.length > 0 && (
-                        <a href={message.media[0]} target="_blank">
-                            <img
-                                className="block mb-2 w-32 h-52 object-cover rounded"
-                                src={message.media[0]}
-                            />
-                        </a>
-                    )}
                     {(message.replyingToContent || message.replyingToMedia) && (
                         <ReplyContent
                             message={message.replyingToContent}
@@ -274,6 +266,16 @@ export const MessageItem = ({
                             userOwnsMessage={userOwnsMessage}
                         />
                     )}
+                    
+                    {message.media && message.media.length > 0 && (
+                        <a href={message.media[0]} target="_blank">
+                            <img
+                                className="block mb-2 w-32 h-52 object-cover rounded"
+                                src={message.media[0]}
+                            />
+                        </a>
+                    )}
+
                     <MessageContent
                         message={message}
                         userOwnsMessage={userOwnsMessage}

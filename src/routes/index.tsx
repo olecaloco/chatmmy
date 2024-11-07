@@ -36,7 +36,9 @@ export const Route = createFileRoute("/")({
 
 function Index() {
     const { user } = useAuthContext();
+    const isFirstFetch = useRef(true);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const firstMessageDocRef = useRef<DocumentData | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const emotesRef = useRef<Emote_API[]>([]);
 
@@ -45,9 +47,6 @@ function Index() {
     );
     const [isUploading, setIsUploading] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
-    const [firstMessageDoc, setFirstMessageDoc] = useState<DocumentData | null>(
-        null
-    );
     const [loadingPrevious, setLoadingPrevious] = useState(false);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [incompleteEmote, setIncompleteEmote] = useState("");
@@ -89,233 +88,109 @@ function Index() {
     }, []);
 
     useEffect(() => {
+        if (!user) return;
+
         const unsub = getChatSnapshot((snapshot) => {
             const _messages: Message[] = [];
 
             snapshot.docChanges().forEach((change) => {
+                const messageData = change.doc.data();
+
                 if (change.type === "added") {
-                    _messages.push(change.doc.data());
-                }
-            });
-
-            if (!snapshot.empty) {
-                setFirstMessageDoc((p) => {
-                    if (p) return p;
-                    return snapshot.docs[snapshot.size - 1];
-                });
-            }
-
-            setMessages((m) => [..._messages, ...m]);
-        });
-
-        return unsub;
-    }, []);
-
-    const processValueOnly = async (value: string) => {
-        let _emoteQueue = [...emoteQueue];
-        let content = value.replace(/\n/g, "\\n");
-        const now = new Date();
-
-        const words = content.trim().split(/\s+/);
-        if (words.length === 1) {
-            const key = words[0];
-            const _singleQueue = emoteQueue.reduce(
-                (acc, emote) => ({ ...acc, ...emote }),
-                {}
-            );
-            if (_singleQueue[key]) {
-                const url = _singleQueue[key].replace("1x", "2x");
-                _emoteQueue = [{ [key]: url }];
-            }
-        }
-
-        const data: any = {
-            content: content.trim(),
-            senderId: user?.uid,
-            createdAt: now,
-            emoteUrls: _emoteQueue,
-            media: [],
-        };
-
-        if (replyingTo) {
-            data.replyingTo = replyingTo.id;
-            data.replyingToContent = replyingTo.content;
-            data.replyingToEmoteUrls = replyingTo.emoteUrls;
-            if (replyingTo.media) {
-                data.replyingToMedia = replyingTo.media;
-            }
-        }
-
-        try {
-            sendMessageToDb(data).then(() => {
-                fetch(`https://ntfy.sh/${user?.uid}`, {
-                    method: "POST",
-                    body: content.trim(),
-                    headers: {
-                        Title: "Chatmmy",
-                        Icon: "https://chatmmy-fullstack.onrender.com/pwa-64x64.png",
-                        Click: "https://chatmmy-edcbc.web.app",
-                    },
-                });
-            });
-        } catch (error) {
-            console.error(error);
-        }
-
-        setEmoteQueue([]);
-        setReplyingTo(null);
-        setFilePreviews([]);
-
-        if (inputRef.current) {
-            inputRef.current.value = "";
-            inputRef.current.focus();
-        }
-
-        if (fileInputRef.current) {
-            fileInputRef.current.value = "";
-        }
-    };
-
-    const processFilesOnly = async (files: FileList) => {
-        setIsUploading(true);
-
-        const data: any = {
-            content: "",
-            senderId: user?.uid,
-            createdAt: new Date(),
-            emoteUrls: [],
-            media: [],
-        };
-
-        if (replyingTo) {
-            data.replyingTo = replyingTo.id;
-            data.replyingToContent = replyingTo.content;
-            data.replyingToEmoteUrls = replyingTo.emoteUrls;
-            if (replyingTo.media) {
-                data.replyingToMedia = replyingTo.media;
-            }
-
-            console.log('test')
-        }
-
-        if (files.length > 0) {
-            await uploadFile(files[0]).then((url) => {
-                data.media = [url];
-
-                if (user) {
-                    try {
-                        sendMessageToDb(data).then(() => {
-                            fetch(`https://ntfy.sh/${user.uid}`, {
-                                method: "POST",
-                                body: "A new image has been posted",
-                                headers: {
-                                    Title: "Chatmmy",
-                                    Icon: "https://chatmmy-fullstack.onrender.com/pwa-64x64.png",
-                                    Click: "https://chatmmy-edcbc.web.app",
-                                },
-                            });
-                        });
-                    } catch (error) {
-                        console.error(error);
-                    }
-                }
-            });
-        }
-
-        setEmoteQueue([]);
-        setReplyingTo(null);
-        setFilePreviews([]);
-        setIsUploading(false);
-
-        if (inputRef.current) {
-            inputRef.current.value = "";
-            inputRef.current.focus();
-        }
-
-        if (fileInputRef.current) {
-            fileInputRef.current.value = "";
-        }
-    };
-
-    const processContent = async (value: string, files: FileList) => {
-        setIsUploading(true);
-
-        let _emoteQueue = [...emoteQueue];
-        let content = value.replace(/\n/g, "\\n");
-        const now = new Date();
-
-        const words = content.trim().split(/\s+/);
-        if (words.length === 1) {
-            const key = words[0];
-            const _singleQueue = emoteQueue.reduce(
-                (acc, emote) => ({ ...acc, ...emote }),
-                {}
-            );
-            if (_singleQueue[key]) {
-                const url = _singleQueue[key].replace("1x", "2x");
-                _emoteQueue = [{ [key]: url }];
-            }
-        }
-
-        const data: any = {
-            content: content.trim(),
-            senderId: user?.uid,
-            createdAt: now,
-            emoteUrls: _emoteQueue,
-            media: [],
-        };
-
-        if (replyingTo) {
-            data.replyingTo = replyingTo.id;
-            data.replyingToContent = replyingTo.content;
-            data.replyingToEmoteUrls = replyingTo.emoteUrls;
-            if (replyingTo.media) {
-                data.replyingToMedia = replyingTo.media;
-            }
-        }
-
-        if (files.length > 0) {
-            await uploadFile(files[0]).then((url) => {
-                data.media = [url];
-
-                if (user) {
-                    try {
-                        sendMessageToDb(data).then(() => {
-                            fetch(`https://ntfy.sh/${user.uid}`, {
-                                method: "POST",
-                                body: content.trim(),
-                                headers: {
-                                    Title: "Chatmmy",
-                                    Icon: "https://chatmmy-fullstack.onrender.com/pwa-64x64.png",
-                                    Click: "https://chatmmy-edcbc.web.app",
-                                },
-                            });
-                        });
-                    } catch (error) {
-                        console.error(error);
-                    }
-                }
-            });
-        } else {
-            if (user) {
-                try {
-                    sendMessageToDb(data).then(() => {
+                    if (
+                        !change.doc.metadata.fromCache &&
+                        messageData.senderId === user.uid &&
+                        !isFirstFetch.current
+                    ) {
                         fetch(`https://ntfy.sh/${user.uid}`, {
                             method: "POST",
-                            body: content.trim(),
+                            body: messageData.content.trim(),
                             headers: {
                                 Title: "Chatmmy",
                                 Icon: "https://chatmmy-fullstack.onrender.com/pwa-64x64.png",
                                 Click: "https://chatmmy-edcbc.web.app",
                             },
                         });
-                    });
-                } catch (error) {
-                    console.error(error);
+                    }
+
+                    _messages.push(messageData);
                 }
+            });
+
+            if (!snapshot.empty && firstMessageDocRef.current) {
+                firstMessageDocRef.current = snapshot.docs[snapshot.size - 1];
+            }
+
+            isFirstFetch.current = false;
+            setMessages((m) => [..._messages, ...m]);
+        });
+
+        return unsub;
+    }, [user]);
+
+    const processEmoteQueue = (value: string) => {
+        let _emoteQueue = [...emoteQueue];
+        const content = value.trim();
+
+        const words = content.trim().split(/\s+/);
+        if (words.length === 1) {
+            const key = words[0];
+            const _singleQueue = emoteQueue.reduce(
+                (acc, emote) => ({ ...acc, ...emote }),
+                {}
+            );
+            if (_singleQueue[key]) {
+                const url = _singleQueue[key].replace("1x", "2x");
+                _emoteQueue = [{ [key]: url }];
             }
         }
 
+        return _emoteQueue;
+    }
+
+    const processMessageData = (value: string, fileOnly = false) => {
+        const content = value.trim();
+        const now = new Date();
+        const _emoteQueue = processEmoteQueue(value);
+
+        const data: any = {
+            content: content ?? "",
+            senderId: user?.uid,
+            createdAt: now,
+            emoteUrls: fileOnly ? [] : _emoteQueue,
+            media: [],
+        };
+
+        if (replyingTo) {
+            data.replyingTo = replyingTo.id;
+            data.replyingToContent = replyingTo.content;
+            data.replyingToEmoteUrls = replyingTo.emoteUrls;
+            if (replyingTo.media) {
+                data.replyingToMedia = replyingTo.media;
+            }
+        }
+
+        return data;
+    }
+
+    const processContent = async (value: string, files: FileList | null) => {
+        const data = processMessageData(value);
+
+        try {
+            if (files) {
+                const url = await uploadFile(files[0]);
+                data.media = [url];
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            sendMessageToDb(data).catch(e => console.error(e));
+        }
+
+        resetValues();
+    };
+
+    const resetValues = () => {
         setEmoteQueue([]);
         setReplyingTo(null);
         setFilePreviews([]);
@@ -329,7 +204,7 @@ function Index() {
         if (fileInputRef.current) {
             fileInputRef.current.value = "";
         }
-    };
+    }
 
     const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -340,9 +215,7 @@ function Index() {
         const value = inputRef.current!.value;
         const files = fileInputRef.current!.files;
 
-        if (value && (!files || files.length === 0)) return processValueOnly(value);
-        if (!value && files && files.length > 0) return processFilesOnly(files);
-        if (value && files && files.length > 0) return processContent(value, files);
+        processContent(value, files);
     };
 
     const onSuggestionClick = (emoteName: string) => {
@@ -406,15 +279,15 @@ function Index() {
     };
 
     const handleLoadMore = async () => {
-        if (!firstMessageDoc) return;
+        if (!firstMessageDocRef.current) return;
 
         setLoadingPrevious(true);
 
-        const documents = await fetchPreviousMessages(firstMessageDoc);
+        const documents = await fetchPreviousMessages(firstMessageDocRef.current);
 
         if (!documents.empty) {
             const _messages = documents.docs.map((d) => d.data());
-            setFirstMessageDoc(documents.docs[documents.size - 1]);
+            firstMessageDocRef.current = documents.docs[documents.size - 1];
             setMessages((m) => [...m, ..._messages]);
         }
 
