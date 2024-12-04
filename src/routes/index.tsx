@@ -113,11 +113,13 @@ function Index() {
                         });
                     }
 
-                    _messages.push(messageData);
+
                 }
+
+                _messages.push(messageData);
             });
 
-            if (!snapshot.empty && firstMessageDocRef.current) {
+            if (!snapshot.empty && !firstMessageDocRef.current) {
                 firstMessageDocRef.current = snapshot.docs[snapshot.size - 1];
             }
 
@@ -177,7 +179,7 @@ function Index() {
         const data = processMessageData(value);
 
         try {
-            if (files) {
+            if (files && files[0]) {
                 const url = await uploadFile(files[0]);
                 data.media = [url];
             }
@@ -210,7 +212,7 @@ function Index() {
         event.preventDefault();
 
         if (isUploading) return;
-        
+
         setShowSuggestions(false);
         const value = inputRef.current!.value;
         const files = fileInputRef.current!.files;
@@ -282,7 +284,6 @@ function Index() {
         if (!firstMessageDocRef.current) return;
 
         setLoadingPrevious(true);
-
         const documents = await fetchPreviousMessages(firstMessageDocRef.current);
 
         if (!documents.empty) {
@@ -318,6 +319,34 @@ function Index() {
         }
     };
 
+    const handlePaste = (event: React.ClipboardEvent<HTMLInputElement>) => {
+        const clipboardItems = event.clipboardData.items;
+        const itemsAreAllString = [...clipboardItems].every(item => item.kind === "string");
+
+        if (itemsAreAllString) return;
+        event.preventDefault();
+
+        for (let i = 0; clipboardItems.length > i; i++) {
+            const item = clipboardItems[i];
+
+            if (item.kind === "file" && item.type.startsWith('image')) {
+                const file = item.getAsFile();
+
+                // Populate the hidden file input with the image file
+                if (file && fileInputRef.current) {
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    fileInputRef.current.files = dataTransfer.files;
+
+                    const changeEvent = new Event('change', { bubbles: true });
+                    fileInputRef.current.dispatchEvent(changeEvent);
+                }
+
+                break; // We don't need to check further once an image is found
+            }
+        }
+    }
+
     const onRemoveFiles = () => {
         setFilePreviews([]);
         if (fileInputRef.current) {
@@ -346,7 +375,7 @@ function Index() {
                     replyingTo={replyingTo}
                     setReplyingTo={setReplyingTo}
                 />
-                
+
                 <FilePreview
                     files={filePreviews}
                     onRemoveFiles={onRemoveFiles}
@@ -378,6 +407,7 @@ function Index() {
                         autoComplete="off"
                         placeholder="Message"
                         onChange={(e) => debounced(e)}
+                        onPaste={handlePaste}
                         disabled={isUploading}
                     />
                     <Button className="rounded-full" title="Send" size="icon" disabled={isUploading}>

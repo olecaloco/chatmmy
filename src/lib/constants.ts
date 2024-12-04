@@ -1,0 +1,1 @@
+export const DOC_LIMIT = 25;

@@ -18,6 +18,7 @@ import {
     Timestamp,
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { DOC_LIMIT } from "./constants";
 
 const converter: FirestoreDataConverter<Message> = {
     toFirestore: (message) => message,
@@ -46,7 +47,7 @@ export function getChatSnapshot(
     const q = query(
         collection(db, "messages"),
         orderBy("createdAt", "desc"),
-        limit(50)
+        limit(DOC_LIMIT)
     ).withConverter(converter);
 
     return onSnapshot(q, callback);
@@ -61,7 +62,7 @@ export function fetchPreviousMessages(doc: DocumentData) {
         collection(db, "messages"),
         orderBy("createdAt", "desc"),
         startAfter(doc),
-        limit(50)
+        limit(DOC_LIMIT)
     ).withConverter(converter);
 
     return getDocs(q);
