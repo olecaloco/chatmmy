@@ -66,6 +66,28 @@
     body {
         @apply bg-background text-foreground;
     }
+
+    /* width */
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    /* Track */
+    ::-webkit-scrollbar-track {
+        background: hsl(var(--background));
+    }
+
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+        --tw-bg-opacity: 1;
+        background: rgb(55 65 81 / var(--tw-bg-opacity));
+        border-radius: 5px;
+    }
+
+    /* Handle on hover */
+    ::-webkit-scrollbar-thumb:hover {
+        background: rgb(55 65 81 / var(--tw-bg-opacity));
+    }
 }
 
 .gsi-material-button {
