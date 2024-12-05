@@ -1,13 +1,6 @@
-// import { cleanupOutdatedCaches, precacheAndRoute } from "workbox-precaching";
-
-// cleanupOutdatedCaches();
-
-// precacheAndRoute(self.__WB_MANIFEST);
-
 importScripts("https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js");
 importScripts("https://www.gstatic.com/firebasejs/10.13.0/firebase-messaging-compat.js");
 
-// Replace these with your own Firebase config keys...
 const firebaseConfig = {
     apiKey: "AIzaSyAiyoh7Jiq3Lm7z-IECE6TKNUoHDCU6jX0",
     authDomain: "chatmmy-edcbc.firebaseapp.com",
@@ -28,9 +21,9 @@ messaging.onBackgroundMessage((payload) => {
     // payload.data.link comes from the Firebase Console where link is the 'key'
     const link = payload.fcmOptions?.link || payload.data?.link;
 
-    const notificationTitle = payload.notification.title;
+    const notificationTitle = payload.data.title;
     const notificationOptions = {
-        body: payload.notification.body,
+        body: payload.data.body,
         icon: "./pwa-192x192.png",
         data: { url: link },
     };
