@@ -108,7 +108,7 @@ function Index() {
                             headers: {
                                 Title: "Chatmmy",
                                 Icon: "https://chatmmy-edcbc.web.app/favicon.ico",
-                                Click: "https://chatmmy-edcbc.web.app",
+                                Click: "https://chatmmy-edcbc.web.app/",
                             },
                         });
                     }
