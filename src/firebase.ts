@@ -1,8 +1,9 @@
 import { getApp, getApps, initializeApp } from "firebase/app";
-import { doc, getFirestore, updateDoc } from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { getStorage } from "firebase/storage";
 import { getMessaging, getToken, isSupported } from "firebase/messaging";
+import { saveDeviceToken } from "./lib/api";
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -23,26 +24,6 @@ export const messaging = async () => {
     return supported ? getMessaging(firebaseApp) : null;
 };
 
-const saveToken = async (token: string) => {
-    const user = auth.currentUser;
-
-    if (user) {
-        const user_uid = user.uid === "8fn9OA8aMjSWiP9VxOB0PxkiBvj2" ? "UcqmsUDy1cXzBYyPOX12NqwaLpc2" : "8fn9OA8aMjSWiP9VxOB0PxkiBvj2"
-        const userRef = doc(db, "users", user_uid);  // Reference to the user's document in the 'users' collection
-
-        try {
-            // Update the user's name in Firestore
-            await updateDoc(userRef, {
-                token: token,  // Update the 'name' field (or any other field)
-            });
-        } catch (error) {
-            console.error("Error updating user's name in Firestore:", error);
-        }
-    } else {
-        console.log("No user is logged in.");
-    }
-}
-
 export const fetchToken = async () => {
     try {
         const fcmMessaging = await messaging();
@@ -50,24 +31,22 @@ export const fetchToken = async () => {
             const token = await getToken(fcmMessaging, {
                 vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
             });
-            saveToken(token);
+            saveDeviceToken(token);
             return token;
         }
         return null;
     } catch (err) {
-        // @ts-ignore
-        alert(err.message);
         console.error("An error occurred while fetching the token:", err);
         return null;
     }
 };
 
-// if (import.meta.env.DEV) {
-//     const { connectAuthEmulator } = await import("firebase/auth");
-//     const { connectFirestoreEmulator } = await import("firebase/firestore");
-//     const { connectStorageEmulator } = await import("firebase/storage");
+if (import.meta.env.DEV) {
+    const { connectAuthEmulator } = await import("firebase/auth");
+    const { connectFirestoreEmulator } = await import("firebase/firestore");
+    const { connectStorageEmulator } = await import("firebase/storage");
 
-//     connectAuthEmulator(auth, "http://localhost:9099", { disableWarnings: true });
-//     connectFirestoreEmulator(db, "localhost", 8080);
-//     connectStorageEmulator(storage, "127.0.0.1", 9199);
-// }
+    connectAuthEmulator(auth, "http://localhost:9099", { disableWarnings: true });
+    connectFirestoreEmulator(db, "localhost", 8080);
+    connectStorageEmulator(storage, "127.0.0.1", 9199);
+}

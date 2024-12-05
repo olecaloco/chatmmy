@@ -1,4 +1,4 @@
-import { db, storage } from "@/firebase";
+import { auth, db, storage } from "@/firebase";
 import { Message } from "@/models";
 import {
     addDoc,
@@ -16,6 +16,7 @@ import {
     QuerySnapshot,
     startAfter,
     Timestamp,
+    updateDoc,
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { DOC_LIMIT } from "./constants";
@@ -84,4 +85,45 @@ export async function uploadFile(file: File) {
     const snapshot = await uploadBytes(imageRef, file);
     const url = await getDownloadURL(snapshot.ref);
     return url;
+}
+
+export async function saveDeviceToken(token: string) {
+    const user = auth.currentUser;
+
+    if (user) {
+        const user_uid = user.uid === "8fn9OA8aMjSWiP9VxOB0PxkiBvj2" ? "UcqmsUDy1cXzBYyPOX12NqwaLpc2" : "8fn9OA8aMjSWiP9VxOB0PxkiBvj2"
+        const userRef = doc(db, "users", user_uid);  // Reference to the user's document in the 'users' collection
+
+        try {
+            const doc = await getDoc(userRef);
+            const data = doc.exists() ? doc.data() : null;
+
+            if (data) {
+                const tokens = [...data.tokens, token];
+                const tokenSet = new Set(tokens);
+                const filteredTokens = [...tokenSet];
+
+                await updateDoc(userRef, { tokens: filteredTokens });
+            }            
+        } catch (error) {
+            console.error("Error updating user's name in Firestore:", error);
+        }
+    } else {
+        console.log("No user is logged in.");
+    }
+}
+
+export async function sendNotification(token: string, title: string, message: string) {
+    fetch("https://chatmmy-notifier.onrender.com/send-notification", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            token: token,
+            title: title,
+            message: message,
+            link: "/",
+        }),
+    });
 }

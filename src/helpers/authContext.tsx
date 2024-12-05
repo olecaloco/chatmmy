@@ -8,7 +8,7 @@ import { getUserData } from "@/lib/api";
 
 type UserData = {
     id: string;
-    token: string
+    tokens: string[]
 }
 
 interface User {
@@ -42,7 +42,7 @@ export const AuthContextProvider = ({ children }: any) => {
                     .then((snapshot) => {
                         if (snapshot.exists() && snapshot.data()) {
                             const snapshotData = snapshot.data();
-                            setData({ id: snapshotData.id, token: snapshotData.token });
+                            setData({ id: snapshotData.id, tokens: snapshotData.tokens });
                         }
 
                         setUser(user);

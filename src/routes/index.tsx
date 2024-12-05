@@ -8,6 +8,7 @@ import {
     getChatSnapshot,
     getEmotes,
     sendMessageToDb,
+    sendNotification,
     uploadFile,
 } from "@/lib/api";
 import { Emote_API, Message } from "@/models";
@@ -176,22 +177,13 @@ function Index() {
                 sendMessageToDb(data)
                     .then(() => {
                         if (notificationPermissionStatus !== "granted") return;
-                        if (!userData || !userData.token) return;
+                        if (!userData || !userData.tokens || userData.tokens.length === 0) return;
 
                         const body = !data.content && data.media ? "An image has been posted" : data.content.trim()
 
-                        fetch("https://chatmmy-notifier.onrender.com/send-notification", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify({
-                                token: userData.token,
-                                title: "A New Message",
-                                message: body,
-                                link: "/",
-                            }),
-                        });
+                        userData.tokens.forEach(token => {
+                            sendNotification(token, "A New Message", body);
+                        })
                     })
                     .catch(e => console.error(e));
             }
