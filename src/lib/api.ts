@@ -73,6 +73,10 @@ export function sendMessageToDb(data: Message) {
     return addDoc(collection(db, "messages"), data);
 }
 
+export function isAppleDevice() {
+    return /iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
 /**
  * 
  * @param file 
@@ -104,7 +108,7 @@ export async function saveDeviceToken(token: string) {
                 const filteredTokens = [...tokenSet];
 
                 await updateDoc(userRef, { tokens: filteredTokens });
-            }            
+            }
         } catch (error) {
             console.error("Error updating user's name in Firestore:", error);
         }
@@ -113,7 +117,19 @@ export async function saveDeviceToken(token: string) {
     }
 }
 
-export async function sendNotification(token: string, title: string, message: string) {
+export async function sendNotificationViaNtfy(id: string, message: string) {
+    fetch(`https://ntfy.sh/${id}`, {
+        method: "POST",
+        body: message,
+        headers: {
+            Title: "Chatmmy",
+            Icon: "https://chatmmy-edcbc.web.app/favicon.ico",
+            Click: "https://chatmmy-edcbc.web.app",
+        },
+    });
+}
+
+export async function sendNotificationViaFCM(token: string, title: string, message: string) {
     fetch("https://chatmmy-notifier.onrender.com/send-notification", {
         method: "POST",
         headers: {
