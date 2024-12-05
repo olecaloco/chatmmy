@@ -91,7 +91,7 @@ function Index() {
         if (!user) return;
 
         const unsub = getChatSnapshot((snapshot) => {
-            const _messages: Message[] = [];
+            const _messages = [] as Message[];
 
             snapshot.docChanges().forEach((change) => {
                 const messageData = change.doc.data();
@@ -107,16 +107,14 @@ function Index() {
                             body: messageData.content.trim(),
                             headers: {
                                 Title: "Chatmmy",
-                                Icon: "https://chatmmy-fullstack.onrender.com/pwa-64x64.png",
+                                Icon: "https://chatmmy-edcbc.web.app/favicon.ico",
                                 Click: "https://chatmmy-edcbc.web.app",
                             },
                         });
                     }
 
-
+                    _messages.push(messageData);
                 }
-
-                _messages.push(messageData);
             });
 
             if (!snapshot.empty && !firstMessageDocRef.current) {
@@ -179,14 +177,15 @@ function Index() {
         const data = processMessageData(value);
 
         try {
-            if (files && files[0]) {
+            if (!isUploading && files && files[0]) {
+                setIsUploading(true);
                 const url = await uploadFile(files[0]);
                 data.media = [url];
             }
         } catch (error) {
             console.error(error);
         } finally {
-            sendMessageToDb(data).catch(e => console.error(e));
+            if (!isUploading) sendMessageToDb(data).catch(e => console.error(e));
         }
 
         resetValues();

@@ -72,10 +72,16 @@ export function sendMessageToDb(data: Message) {
     return addDoc(collection(db, "messages"), data);
 }
 
+/**
+ * 
+ * @param file 
+ * @returns A string url for the uploaded image
+ */
 export async function uploadFile(file: File) {
     const now = new Date().getTime();
     const name = `${now}-${file.name}`
     const imageRef = ref(storage, name);
     const snapshot = await uploadBytes(imageRef, file);
-    return getDownloadURL(snapshot.ref);
+    const url = await getDownloadURL(snapshot.ref);
+    return url;
 }
