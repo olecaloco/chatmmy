@@ -14,13 +14,17 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'prompt',
+      strategies: 'generateSW',
+      srcDir: 'public',
+      filename: 'sw.js',
       manifest: {
         name: 'Chatmmy',
         short_name: 'Chatmmy',
         start_url: '/',
+        scope: '/',
         display: 'standalone',
-        background_color: '#ffffff',
-        theme_color: '#000',
+        background_color: '#050a18',
+        theme_color: '#050a18',
         share_target: {
           action: "/",
           method: "GET",

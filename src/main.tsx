@@ -7,7 +7,6 @@ import { routeTree } from './routeTree.gen'
 import './index.css'
 import { AuthContextProvider, useAuthContext } from './helpers/authContext'
 import { ThemeProvider } from './components/theme-provider'
-import { register } from './sw'
 
 // Create a new router instance
 const router = createRouter({
@@ -45,5 +44,3 @@ if (!rootElement.innerHTML) {
     </StrictMode>,
   )
 }
-
-register();

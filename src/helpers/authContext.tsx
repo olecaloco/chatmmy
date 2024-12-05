@@ -7,62 +7,62 @@ import Icon from "@/assets/icon.svg";
 import { getUserData } from "@/lib/api";
 
 type UserData = {
-  id: string;
-  tokens: string[]
+    id: string;
+    token: string
 }
 
 interface User {
-  user: FirebaseUser | null;
-  userData: UserData | null;
+    user: FirebaseUser | null;
+    userData: UserData | null;
 }
 
-const userObj: User = { user: null, userData: null};
+const userObj: User = { user: null, userData: null };
 export const AuthContext = React.createContext(userObj);
 
 export const useAuthContext = () => React.useContext<User>(AuthContext);
 
 const Loader = () => (
-  <div className="h-dvh flex items-center justify-center flex-1">
-    <img className="w-24" src={Icon} alt="Chatmmy" />
-  </div>
+    <div className="h-dvh flex items-center justify-center flex-1">
+        <img className="w-24" src={Icon} alt="Chatmmy" />
+    </div>
 )
 
 export const AuthContextProvider = ({ children }: any) => {
-  const [user, setUser] = React.useState<FirebaseUser | null>(null);
-  const [userData, setData] = React.useState<UserData | null>(null);
-  const [loading, setLoading] = React.useState(true);
+    const [user, setUser] = React.useState<FirebaseUser | null>(null);
+    const [userData, setData] = React.useState<UserData | null>(null);
+    const [loading, setLoading] = React.useState(true);
 
-  React.useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-
-        setUser(user);
-
-        getUserData(user.uid)
-            .then((snapshot) => {
-                if (snapshot.exists() && snapshot.data()) {
-                    const snapshotData = snapshot.data();
-                    setData({ id: snapshotData.id, tokens: snapshotData.tokens });
-                }
+    React.useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
 
                 setUser(user);
-            }).catch(e => {
-              console.error(e)
-              setUser(user);
-            });
 
-      } else {
-        setUser(null);
-      }
-      setLoading(false);
-    });
+                getUserData(user.uid)
+                    .then((snapshot) => {
+                        if (snapshot.exists() && snapshot.data()) {
+                            const snapshotData = snapshot.data();
+                            setData({ id: snapshotData.id, token: snapshotData.token });
+                        }
 
-    return () => unsubscribe();
-  }, []);
+                        setUser(user);
+                    }).catch(e => {
+                        console.error(e)
+                        setUser(user);
+                    });
 
-  return (
-    <AuthContext.Provider value={{ user, userData }}>
-      {loading ? <Loader /> : children}
-    </AuthContext.Provider>
-  );
+            } else {
+                setUser(null);
+            }
+            setLoading(false);
+        });
+
+        return () => unsubscribe();
+    }, []);
+
+    return (
+        <AuthContext.Provider value={{ user, userData }}>
+            {loading ? <Loader /> : children}
+        </AuthContext.Provider>
+    );
 };

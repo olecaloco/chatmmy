@@ -19,6 +19,7 @@ import { useDebouncedCallback } from "use-debounce";
 import { ReplyingTo } from "@/components/app/replyingTo";
 import { FilePreview } from "@/components/app/filePreview";
 import { FilePreview as FilePreviewInterface } from "@/lib/types";
+import useFcmToken from "@/hooks/use-fcm-token";
 
 export const Route = createFileRoute("/")({
     beforeLoad: ({ context, location }) => {
@@ -35,7 +36,9 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-    const { user } = useAuthContext();
+    const { token, notificationPermissionStatus } = useFcmToken();
+
+    const { user, userData } = useAuthContext();
     const isFirstFetch = useRef(true);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const firstMessageDocRef = useRef<DocumentData | null>(null);
@@ -97,22 +100,6 @@ function Index() {
                 const messageData = change.doc.data();
 
                 if (change.type === "added") {
-                    if (
-                        !change.doc.metadata.fromCache &&
-                        messageData.senderId === user.uid &&
-                        !isFirstFetch.current
-                    ) {
-                        fetch(`https://ntfy.sh/${user.uid}`, {
-                            method: "POST",
-                            body: messageData.content.trim(),
-                            headers: {
-                                Title: "Chatmmy",
-                                Icon: "https://chatmmy-edcbc.web.app/favicon.ico",
-                                Click: "https://chatmmy-edcbc.web.app/",
-                            },
-                        });
-                    }
-
                     _messages.push(messageData);
                 }
             });
@@ -126,7 +113,7 @@ function Index() {
         });
 
         return unsub;
-    }, [user]);
+    }, [user, token,]);
 
     const processEmoteQueue = (value: string) => {
         let _emoteQueue = [...emoteQueue];
@@ -185,7 +172,29 @@ function Index() {
         } catch (error) {
             console.error(error);
         } finally {
-            if (!isUploading) sendMessageToDb(data).catch(e => console.error(e));
+            if (!isUploading) {
+                sendMessageToDb(data)
+                    .then(() => {
+                        if (notificationPermissionStatus !== "granted") return;
+                        if (!userData || !userData.token) return;
+
+                        const body = !data.content && data.media ? "An image has been posted" : data.content.trim()
+
+                        fetch("https://chatmmy-notifier.onrender.com/send-notification", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({
+                                token: userData.token,
+                                title: "A New Message",
+                                message: body,
+                                link: "/",
+                            }),
+                        });
+                    })
+                    .catch(e => console.error(e));
+            }
         }
 
         resetValues();
@@ -409,6 +418,7 @@ function Index() {
                         onPaste={handlePaste}
                         disabled={isUploading}
                     />
+
                     <Button className="rounded-full" title="Send" size="icon" disabled={isUploading}>
                         <Send />
                     </Button>

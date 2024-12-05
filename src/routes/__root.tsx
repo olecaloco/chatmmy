@@ -18,9 +18,8 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { EllipsisVertical } from "lucide-react";
 import { User } from "firebase/auth";
-// import { Switch } from "@/components/ui/switch";
-// import { setupNotifications } from "@/firebase";
 import { getEmotes } from "@/lib/api";
+import { Toaster } from "@/components/ui/sonner";
 
 interface MyRouterContext {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -34,6 +33,10 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 
 function RootComponent() {
     const { user } = useAuthContext();
+
+    const handleRequestNotification = () => {
+        Notification.requestPermission();
+    }
 
     const handleRefreshEmotes = () => {
         getEmotes((response) => {
@@ -63,12 +66,12 @@ function RootComponent() {
                                 <DropdownMenuLabel>
                                     <ModeToggle />
                                 </DropdownMenuLabel>
-                                {/* <DropdownMenuLabel>
-                                    <NotificationTrigger userData={userData} />
-                                </DropdownMenuLabel> */}
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem onClick={handleRefreshEmotes}>
                                     Refresh Emotes
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={handleRequestNotification}>
+                                    Request Notification
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem
@@ -85,37 +88,10 @@ function RootComponent() {
                 </div>
             </div>
             <Outlet />
+            <Toaster position="top-right" />
         </div>
     );
 }
-
-// const NotificationTrigger = ({ userData }: { userData: any }) => {
-//     const token = window.localStorage.getItem("token");
-//     let defaultChecked = false;
-
-//     if (
-//         userData &&
-//         token &&
-//         userData.tokens.includes(token)
-//     ) {
-//         defaultChecked = true;
-//     }
-
-//     const handleOnCheckChange = (value: boolean) => {
-//         if (value) {
-//             setupNotifications();
-//         } else {
-//             return;
-//         }
-//     }
-
-//     return (
-//         <div className="flex items-center space-between gap-4">
-//             <span className="flex-1">Notification</span>
-//             <Switch defaultChecked={defaultChecked} onCheckedChange={handleOnCheckChange} />
-//         </div>
-//     )
-// }
 
 const SettingsTrigger = ({ user }: { user: User | null }) => {
     if (user && user.photoURL && user.displayName) {
@@ -127,7 +103,7 @@ const SettingsTrigger = ({ user }: { user: User | null }) => {
         );
     }
 
-    return (        
+    return (
         <EllipsisVertical />
     );
 };
