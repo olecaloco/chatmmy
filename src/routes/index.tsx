@@ -216,7 +216,7 @@ function Index() {
         const isLastPartEmote = lastPart.startsWith(":");
         const emoteFragment = lastPart.slice(1);
 
-        if (isLastPartEmote) {
+        if (isLastPartEmote && emoteFragment) {
             if (!showSuggestions) setShowSuggestions(true);
             setIncompleteEmote(emoteFragment);
         } else {
