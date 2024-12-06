@@ -41,7 +41,7 @@ export const Messages = memo(({
             <div
                 ref={scrollableRef}
                 onScroll={() => debounced()}
-                className="h-full flex flex-col-reverse space-y-reverse px-4 overflow-y-auto"
+                className="h-full flex flex-col-reverse space-y-px space-y-reverse px-4 pb-4 overflow-y-auto"
             >
                 {messages.map((message, index) => (
                     <MessageItem
@@ -62,7 +62,7 @@ export const Messages = memo(({
         </div>
     );
 }, (prev, next) => {
-    if (prev.messages.length === next.messages.length) { 
+    if (prev.messages.length === next.messages.length) {
         return true;
     } else {
         return false;
@@ -118,7 +118,7 @@ const ScrollToBottomButton = ({
 }) => (
     <Button
         className={cn(
-            "absolute bottom-1 left-1/2 w-7 h-7 -translate-x-1/2 z-10 rounded-full bg-blue-500 hover:bg-blue-600",
+            "absolute bottom-1 left-1/2 w-7 h-7 -translate-x-1/2 z-10 rounded-full bg-primary",
             {
                 hidden: !showButton,
             }

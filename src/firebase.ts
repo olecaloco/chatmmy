@@ -41,12 +41,12 @@ export const fetchToken = async () => {
     }
 };
 
-// if (import.meta.env.DEV) {
-//     const { connectAuthEmulator } = await import("firebase/auth");
-//     const { connectFirestoreEmulator } = await import("firebase/firestore");
-//     const { connectStorageEmulator } = await import("firebase/storage");
+if (import.meta.env.DEV) {
+    const { connectAuthEmulator } = await import("firebase/auth");
+    const { connectFirestoreEmulator } = await import("firebase/firestore");
+    const { connectStorageEmulator } = await import("firebase/storage");
 
-//     connectAuthEmulator(auth, "http://localhost:9099", { disableWarnings: true });
-//     connectFirestoreEmulator(db, "localhost", 8080);
-//     connectStorageEmulator(storage, "127.0.0.1", 9199);
-// }
+    connectAuthEmulator(auth, "http://localhost:9099", { disableWarnings: true });
+    connectFirestoreEmulator(db, "localhost", 8080);
+    connectStorageEmulator(storage, "127.0.0.1", 9199);
+}
