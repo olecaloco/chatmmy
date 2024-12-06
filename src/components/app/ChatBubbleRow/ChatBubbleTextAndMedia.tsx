@@ -1,4 +1,3 @@
-import Fancybox from "@/components/fancybox";
 import { normalizeMessageContent } from "@/lib/normalizeMessage";
 import { cn } from "@/lib/utils";
 import { Message } from "@/models";
@@ -19,13 +18,13 @@ const ChatBubbleTextAndMedia = ({ message, isMyMessage }: Props) => {
                 }
             )}
         >
-            <Fancybox>
-                {message.media?.map((m, i) => (
-                    <a key={i} href={m} data-fancybox="gallery">
-                        <img className="w-32 h-52 object-cover rounded" src={m} alt="" />
-                    </a>
-                ))}
-            </Fancybox>
+
+            {message.media?.map((m, i) => (
+                <a key={i} href={m} data-fancybox="gallery">
+                    <img className="w-32 h-52 object-cover rounded" src={m} alt="" />
+                </a>
+            ))}
+
             <div className="mt-2">
                 {
                     normalizeMessageContent(

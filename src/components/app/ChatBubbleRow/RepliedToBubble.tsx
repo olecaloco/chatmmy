@@ -1,4 +1,3 @@
-import Fancybox from "@/components/fancybox";
 import { normalizeMessageContent } from "@/lib/normalizeMessage";
 import { cn } from "@/lib/utils";
 import { Message } from "@/models";
@@ -22,11 +21,7 @@ const RepliedToBubble = ({ message, isMyMessage }: Props) => {
         >
             <span className="block mb-2 text-xs">Replied To:</span>
             {(replyHasMedia && message.replyingToMedia) && (
-                <Fancybox>
-                    <a href={message.replyingToMedia[0]} data-fancybox="gallery">
-                        <img className="w-32 h-52 rounded object-cover" src={message.replyingToMedia[0]} alt="" />
-                    </a>
-                </Fancybox>
+                <img className="w-32 h-52 rounded object-cover" src={message.replyingToMedia[0]} alt="" />
             )}
             <div>
                 {
