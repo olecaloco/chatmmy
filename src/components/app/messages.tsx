@@ -5,7 +5,6 @@ import { ChevronDown } from "lucide-react";
 import { memo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useDebouncedCallback } from "use-debounce";
-import Fancybox from "../fancybox";
 
 export const Messages = memo(({
     messages,
@@ -37,7 +36,7 @@ export const Messages = memo(({
     const debounced = useDebouncedCallback(handleScroll, 250);
 
     return (
-        <Fancybox options={{ placeFocusBack: false, Carousel: { infinite: false } }}>
+        <div className="flex-1 relative overflow-hidden">
             <ScrollToBottomButton showButton={showButton} scrollToBottom={scrollToBottom} />
             <div
                 ref={scrollableRef}
@@ -60,8 +59,7 @@ export const Messages = memo(({
                     />
                 )}
             </div>
-
-        </Fancybox>
+        </div>
     );
 }, (prev, next) => {
     if (prev.messages.length === next.messages.length) {
