@@ -2,7 +2,7 @@ import { FilePreview as FilePreviewInterface } from "@/lib/types";
 import { X } from "lucide-react";
 import { Button } from "../ui/button";
 
-export const FilePreview = ({ files, onRemoveFiles }: { files: FilePreviewInterface[], onRemoveFiles: () => void }) => {
+export const FilePreview = ({ isUploading, files, onRemoveFiles }: { isUploading: boolean; files: FilePreviewInterface[], onRemoveFiles: () => void }) => {
     if (files.length === 0) return null;
 
     return (
@@ -18,15 +18,17 @@ export const FilePreview = ({ files, onRemoveFiles }: { files: FilePreviewInterf
                     />
                 ))}
             </div>
-            <Button
-                className="w-6 h-6 p-0 rounded-full"
-                variant="outline"
-                size="icon"
-                type="button"
-                onClick={onRemoveFiles}
-            >
-                <X className="w-4 h-4" />
-            </Button>
+            {!isUploading && (
+                <Button
+                    className="w-6 h-6 p-0 rounded-full"
+                    variant="outline"
+                    size="icon"
+                    type="button"
+                    onClick={onRemoveFiles}
+                >
+                    <X className="w-4 h-4" />
+                </Button>
+            )}
         </div>
     );
 };

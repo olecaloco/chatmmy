@@ -39,7 +39,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-    const { token, notificationPermissionStatus } = useFcmToken();
+    const { notificationPermissionStatus } = useFcmToken();
 
     const { user, userData } = useAuthContext();
     const isFirstFetch = useRef(true);
@@ -96,27 +96,26 @@ function Index() {
     useEffect(() => {
         if (!user) return;
 
-        const unsub = getChatSnapshot((snapshot) => {
-            const _messages = [] as Message[];
-
-            snapshot.docChanges().forEach((change) => {
-                const messageData = change.doc.data();
-
-                if (change.type === "added") {
-                    _messages.push(messageData);
+        const unsubscribe = getChatSnapshot((snapshot) => {
+            if (isFirstFetch.current) {
+                setMessages(snapshot.docs.map(d => d.data()));
+            } else {
+                if (!snapshot.empty) {
+                    const lastSnapshot = snapshot.docs[snapshot.size - 1];
+                    const lastSnapshotData = lastSnapshot.data();
+                    setMessages(m => [lastSnapshotData, ...m]);
                 }
-            });
+            }
 
             if (!snapshot.empty && !firstMessageDocRef.current) {
                 firstMessageDocRef.current = snapshot.docs[snapshot.size - 1];
             }
 
             isFirstFetch.current = false;
-            setMessages((m) => [..._messages, ...m]);
         });
 
-        return unsub;
-    }, [user, token,]);
+        return () => unsubscribe();
+    }, [user]);
 
     const processEmoteQueue = (value: string) => {
         let _emoteQueue = [...emoteQueue];
@@ -222,6 +221,9 @@ function Index() {
         setShowSuggestions(false);
         const value = inputRef.current!.value;
         const files = fileInputRef.current!.files;
+
+        // Prevent submission when there's no text or file input
+        if (!value && (!files || files.length === 0)) return;
 
         processContent(value, files);
     };
@@ -383,6 +385,7 @@ function Index() {
                 />
 
                 <FilePreview
+                    isUploading={isUploading}
                     files={filePreviews}
                     onRemoveFiles={onRemoveFiles}
                 />
