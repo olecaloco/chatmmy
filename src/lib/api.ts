@@ -118,7 +118,7 @@ export async function saveDeviceToken(token: string) {
 }
 
 export async function sendNotificationViaNtfy(id: string, message: string) {
-    fetch(`https://ntfy.sh/${id}`, {
+    return fetch(`https://ntfy.sh/${id}`, {
         method: "POST",
         body: message,
         headers: {
@@ -130,7 +130,7 @@ export async function sendNotificationViaNtfy(id: string, message: string) {
 }
 
 export async function sendNotificationViaFCM(token: string, title: string, message: string) {
-    fetch("https://chatmmy-notifier.onrender.com/send-notification", {
+    return fetch("https://chatmmy-notifier.onrender.com/send-notification", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

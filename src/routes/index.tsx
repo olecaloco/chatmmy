@@ -183,13 +183,13 @@ function Index() {
 
                         const body = !data.content && data.media ? "An image has been posted" : data.content.trim()
 
-                        userData.tokens.forEach(token => {
-                            if (isAppleDevice()) {
-                                sendNotificationViaNtfy(user!.uid, body)
-                            } else {
+                        if (isAppleDevice()) {
+                            sendNotificationViaNtfy(user!.uid, body)
+                        } else {
+                            userData.tokens.forEach(token => {
                                 sendNotificationViaFCM(token, "A New Message", body);
-                            }
-                        })
+                            });
+                        }
                     })
                     .catch(e => console.error(e));
             }
