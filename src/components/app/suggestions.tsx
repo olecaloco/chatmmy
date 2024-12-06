@@ -11,7 +11,7 @@ export const Suggestions = memo(({
     onSuggestionClick: (name: string) => void;
 }) => {
     return (
-        <div className="mt-4 w-full p-2 bg-background border bg-muted">
+        <div className="mt-4 w-full p-2 bg-background border">
             <small className="p-2 font-bold text-muted-foreground">
                 Matched emotes
             </small>
