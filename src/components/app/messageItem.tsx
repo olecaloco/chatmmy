@@ -83,7 +83,12 @@ export const MessageItem = ({
             <animated.div
                 {...bind()}
                 style={{ ...style }}
-                className="[overflow-wrap:anywhere] touch-none w-max max-w-[75%]"
+                className={
+                    cn("flex flex-col [overflow-wrap:anywhere] touch-none w-max max-w-[75%]", {
+                        "items-end": userOwnsMessage,
+                        "items-start": !userOwnsMessage
+                    })
+                }
             >
                 {hasReplyContent && <RepliedToBubble message={message} isMyMessage={userOwnsMessage} />}
                 <ChatBubble message={message} isMyMessage={userOwnsMessage} />

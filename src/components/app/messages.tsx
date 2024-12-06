@@ -118,12 +118,11 @@ const ScrollToBottomButton = ({
 }) => (
     <Button
         className={cn(
-            "absolute bottom-1 left-1/2 w-7 h-7 -translate-x-1/2 z-10 rounded-full bg-primary",
+            "absolute bottom-1 left-1/2 w-7 h-7 -translate-x-1/2 z-10 rounded-full",
             {
                 hidden: !showButton,
             }
         )}
-        variant="secondary"
         size="icon"
         onClick={scrollToBottom}
     >
