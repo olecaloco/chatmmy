@@ -13,9 +13,17 @@ const ChatBubbleTextOnly = ({
     isMyMessage
 }: Props) => {
 
-    const singleToken = message.content.split(" ").length === 1 ? true : false;
-    const hasEmotes = message.emoteUrls && message.emoteUrls.length > 0 ? true : false;
-    const emoteOnly = singleToken && hasEmotes ? true : false;
+    const fragments = message.content.split(" ");
+    const stringEmotes = window.localStorage.getItem("emotes");
+    const singleToken = fragments.length === 1 ? true : false;
+    let emoteOnly = false;
+
+
+    if (singleToken && stringEmotes) {
+        const emotes = JSON.parse(stringEmotes);
+        const emote = emotes.find((e: any) => e.name === fragments[0]);
+        if (emote) emoteOnly = true;
+    }
 
     return (
         <div

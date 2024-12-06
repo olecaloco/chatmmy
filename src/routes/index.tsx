@@ -8,10 +8,8 @@ import {
     getChatSnapshot,
     getEmotes,
     sendMessageToDb,
-    sendNotificationViaNtfy,
     sendNotificationViaFCM,
     uploadFile,
-    isAppleDevice,
 } from "@/lib/api";
 import { Emote_API, Message } from "@/models";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
@@ -158,13 +156,9 @@ function Index() {
 
                         const body = !data.content && data.media ? "An image has been posted" : data.content.trim()
 
-                        if (isAppleDevice()) {
-                            sendNotificationViaNtfy(user!.uid, body)
-                        } else {
-                            userData.tokens.forEach(token => {
-                                sendNotificationViaFCM(token, "A New Message", body);
-                            });
-                        }
+                        userData.tokens.forEach(token => {
+                            sendNotificationViaFCM(token, "A New Message", body);
+                        });
                     })
                     .catch(e => console.error(e));
             }

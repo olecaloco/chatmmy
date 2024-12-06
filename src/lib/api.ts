@@ -73,10 +73,6 @@ export function sendMessageToDb(data: Message) {
     return addDoc(collection(db, "messages"), data);
 }
 
-export function isAppleDevice() {
-    return /iPhone|iPad|iPod/i.test(navigator.userAgent);
-}
-
 /**
  * 
  * @param file 
@@ -115,18 +111,6 @@ export async function saveDeviceToken(token: string) {
     } else {
         console.log("No user is logged in.");
     }
-}
-
-export async function sendNotificationViaNtfy(id: string, message: string) {
-    return fetch(`https://ntfy.sh/${id}`, {
-        method: "POST",
-        body: message,
-        headers: {
-            Title: "Chatmmy",
-            Icon: "https://chatmmy-edcbc.web.app/favicon.ico",
-            Click: "https://chatmmy-edcbc.web.app",
-        },
-    });
 }
 
 export async function sendNotificationViaFCM(token: string, title: string, message: string) {
