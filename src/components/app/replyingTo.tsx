@@ -40,6 +40,7 @@ export const ReplyingTo = ({
                                             className="w-12 h-12 object-cover"
                                             src={replyingTo.media[0]}
                                             alt=""
+                                            loading="lazy"
                                         />
                                     )}
 

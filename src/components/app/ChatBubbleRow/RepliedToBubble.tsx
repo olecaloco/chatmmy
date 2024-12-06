@@ -21,7 +21,7 @@ const RepliedToBubble = ({ message, isMyMessage }: Props) => {
         >
             <span className="block mb-2 text-xs">Replied To:</span>
             {(replyHasMedia && message.replyingToMedia) && (
-                <img className="w-32 h-52 rounded object-cover" src={message.replyingToMedia[0]} alt="" />
+                <img className="w-32 h-52 rounded object-cover" src={message.replyingToMedia[0]} alt="" loading="lazy" />
             )}
             <div>
                 {

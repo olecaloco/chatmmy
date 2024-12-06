@@ -24,7 +24,7 @@ export function normalizeMessageContent(message: string, emotes?: Message["emote
             const emote = emotes.find(e => e[word]);
             if (emote) {
                 const value = emote[word];
-                return <img key={index} src={value} alt={word} className={cn("inline-block", { "h-6": reply })} title={word} />
+                return <img key={index} src={value} alt={word} className={cn("inline-block", { "h-6": reply })} title={word} loading="lazy" />
             }
         }
 

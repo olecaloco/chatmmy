@@ -50,7 +50,7 @@ function RootComponent() {
             <div className="p-4 flex items-center justify-between border-b">
                 <Link to="/" className="[&.active]:font-bold">
                     <span className="flex items-center gap-2">
-                        <img src={Icon} alt="Chatmmy" className="h-8 w-8" />
+                        <img src={Icon} alt="Chatmmy" className="h-8 w-8" loading="lazy" />
                         Chatmmy
                     </span>
                 </Link>

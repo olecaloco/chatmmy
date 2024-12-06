@@ -22,7 +22,7 @@ export const useAuthContext = () => useContext<User>(AuthContext);
 
 const Loader = () => (
     <div className="h-dvh flex items-center justify-center flex-1">
-        <img className="w-24" src={Icon} alt="Chatmmy" />
+        <img className="w-24" src={Icon} alt="Chatmmy" loading="lazy" />
     </div>
 )
 

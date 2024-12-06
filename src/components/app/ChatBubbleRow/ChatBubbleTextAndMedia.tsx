@@ -22,7 +22,7 @@ const ChatBubbleTextAndMedia = ({ message, isMyMessage }: Props) => {
             <Fancybox>
                 {message.media?.map((m, i) => (
                     <a key={i} href={m} data-fancybox="gallery">
-                        <img className="w-32 h-52 object-cover rounded" src={m} alt="" />
+                        <img className="w-32 h-52 object-cover rounded" src={m} alt="" loading="lazy" />
                     </a>
                 ))}
             </Fancybox>

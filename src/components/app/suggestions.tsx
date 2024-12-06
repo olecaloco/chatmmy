@@ -30,6 +30,7 @@ export const Suggestions = memo(({
                             <img
                                 src={`${s.data.host.url}/1x.webp`}
                                 alt={s.name}
+                                loading="lazy"
                             />
                             :{s.name}:
                         </span>
