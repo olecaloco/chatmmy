@@ -56,9 +56,6 @@ function Index() {
     const [loadingPrevious, setLoadingPrevious] = useState(false);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [incompleteEmote, setIncompleteEmote] = useState("");
-    const [emoteQueue, setEmoteQueue] = useState<{ [key: string]: string }[]>(
-        []
-    );
     const [replyingTo, setReplyingTo] = useState<Message | null>(null);
 
     const navigate = useNavigate();
@@ -101,9 +98,9 @@ function Index() {
                 setMessages(snapshot.docs.map(d => d.data()));
             } else {
                 if (!snapshot.empty) {
-                    const lastSnapshot = snapshot.docs[snapshot.size - 1];
-                    const lastSnapshotData = lastSnapshot.data();
-                    setMessages(m => [lastSnapshotData, ...m]);
+                    const firstSnapshot = snapshot.docs[0];
+                    const firstSnapshotData = firstSnapshot.data();
+                    setMessages(m => [firstSnapshotData, ...m]);
                 }
             }
 
@@ -117,36 +114,15 @@ function Index() {
         return () => unsubscribe();
     }, [user]);
 
-    const processEmoteQueue = (value: string) => {
-        let _emoteQueue = [...emoteQueue];
-        const content = value.trim();
-
-        const words = content.trim().split(/\s+/);
-        if (words.length === 1) {
-            const key = words[0];
-            const _singleQueue = emoteQueue.reduce(
-                (acc, emote) => ({ ...acc, ...emote }),
-                {}
-            );
-            if (_singleQueue[key]) {
-                const url = _singleQueue[key].replace("1x", "2x");
-                _emoteQueue = [{ [key]: url }];
-            }
-        }
-
-        return _emoteQueue;
-    }
-
-    const processMessageData = (value: string, fileOnly = false) => {
+    const processMessageData = (value: string) => {
         const content = value.trim();
         const now = new Date();
-        const _emoteQueue = processEmoteQueue(value);
 
         const data: any = {
             content: content ?? "",
             senderId: user?.uid,
             createdAt: now,
-            emoteUrls: fileOnly ? [] : _emoteQueue,
+            emoteUrls: [],
             media: [],
         };
 
@@ -198,7 +174,6 @@ function Index() {
     };
 
     const resetValues = () => {
-        setEmoteQueue([]);
         setReplyingTo(null);
         setFilePreviews([]);
         setIsUploading(false);
@@ -230,52 +205,26 @@ function Index() {
 
     const onSuggestionClick = (emoteName: string) => {
         if (inputRef.current) {
-            const text = inputRef.current.value;
-            const newText = text.replace(
-                /:(\w+)(?!:)(?<!:\w+:)/g,
-                `${emoteName}`
-            );
-            inputRef.current.value = newText;
+            const currentText = inputRef.current.value;
+            const splittedText = currentText.split(" ");
+            splittedText[splittedText.length - 1] = emoteName
+
             setShowSuggestions(false);
-
-            const emote = suggestions.find((e) => e.name === emoteName);
-
-            if (emote) {
-                const { host } = emote.data;
-                const url = host.url + "/" + "1x.webp";
-                setEmoteQueue([...emoteQueue, { [emoteName]: url }]);
-            }
-
+            inputRef.current.value = splittedText.join(" ").trim();
             inputRef.current.focus();
         }
     };
 
     const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
         const text = event.target.value;
+        const textParts = text.split(" ")
+        const lastPart = textParts[textParts.length - 1];
+        const isLastPartEmote = lastPart.startsWith(":");
+        const emoteFragment = lastPart.slice(1);
 
-        // Split text into words and potential emote parts
-        const parts = text
-            .split(/\s+/)
-            .filter((part) => part !== "" || part !== undefined);
-
-        // Find the last potential emote part
-        const lastEmotePart = parts.reduceRight((acc, part) => {
-            if (
-                part.startsWith(":") &&
-                !part.endsWith(":") &&
-                !/^:\w+:$/.test(part)
-            ) {
-                return part.slice(1);
-            }
-            return acc;
-        }, "");
-
-        if (lastEmotePart) {
-            if (!showSuggestions) {
-                setShowSuggestions(true);
-            }
-
-            setIncompleteEmote(lastEmotePart);
+        if (isLastPartEmote) {
+            if (!showSuggestions) setShowSuggestions(true);
+            setIncompleteEmote(emoteFragment);
         } else {
             setShowSuggestions(false);
         }

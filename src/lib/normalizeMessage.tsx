@@ -1,18 +1,16 @@
-import { Message } from "@/models";
 import { cn, isValidHttpUrl } from "./utils";
 
-export function normalizeMessageContent(message: string, emotes?: Message["emoteUrls"], reply?: boolean, userOwnsMessage?: boolean) {
+export function normalizeMessage(message: string, type: "not-reply" | "reply" = "not-reply") {
     if (!message) return;
 
-    let content = message.replace(/\\n/g, '\n');
-    let contentParts = content.split(/ /g);
+    let contentParts = message.split(" ");
+    const reply = type === "reply" ? true : false;
+    const emotesString = window.localStorage.getItem("emotes");
 
     let _content = contentParts.map((word, index) => {
         if (isValidHttpUrl(word)) {
             return <a
-                className={cn("text-blue-500 visited:text-purple-600 underline", {
-                    "dark:text-[#8cc7e5] dark:visited:text-[#ff91a4]": !userOwnsMessage
-                })}
+                className="underline"
                 key={index}
                 href={word}
             >
@@ -20,11 +18,16 @@ export function normalizeMessageContent(message: string, emotes?: Message["emote
             </a>
         }
 
-        if (emotes && emotes.length > 0) {
-            const emote = emotes.find(e => e[word]);
+        if (emotesString) {
+            const emotes = JSON.parse(emotesString);
+            const emote = emotes.find((e: any) => e.name === word);
+
             if (emote) {
-                const value = emote[word];
-                return <img key={index} src={value} alt={word} className={cn("inline-block", { "h-6": reply })} title={word} loading="lazy" />
+                const url = emote.data.host.url;
+                const fileName = contentParts.length === 1 ? "2x.webp" : "1x.webp";
+                const fullPath = `${url}/${fileName}`;
+
+                return <img key={index} src={fullPath} alt={word} className={cn("inline-block", { "h-6": reply })} title={word} loading="lazy" />
             }
         }
 

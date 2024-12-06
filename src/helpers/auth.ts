@@ -15,7 +15,8 @@ export function onAuthStateChanged(cb: any) {
 export async function signInWithEmailPassword(email: string, password: string) {
     try {
         await signInWithEmailAndPassword(auth, email, password);
-    } catch (error) {
+    } catch (error: any) {
+        alert(error.message)
         console.error("Error signing in with Google", error);
     }
 }

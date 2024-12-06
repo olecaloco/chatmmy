@@ -1,4 +1,4 @@
-import { normalizeMessageContent } from "@/lib/normalizeMessage";
+import { normalizeMessage } from "@/lib/normalizeMessage";
 import { cn } from "@/lib/utils";
 import { Message } from "@/models";
 import Fancybox from "@/components/fancybox";
@@ -28,14 +28,7 @@ const ChatBubbleTextAndMedia = ({ message, isMyMessage }: Props) => {
             </Fancybox>
 
             <div className="mt-2">
-                {
-                    normalizeMessageContent(
-                        message.content,
-                        message.emoteUrls,
-                        false,
-                        isMyMessage
-                    )
-                }
+                {normalizeMessage(message.content)}
             </div>
         </div>
     )

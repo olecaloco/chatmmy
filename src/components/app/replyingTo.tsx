@@ -1,5 +1,5 @@
 import { animated, easings, useTransition } from "@react-spring/web";
-import { normalizeMessageContent } from "@/lib/normalizeMessage";
+import { normalizeMessage } from "@/lib/normalizeMessage";
 import { X } from "lucide-react";
 import { Message } from "@/models";
 import { Button } from "../ui/button";
@@ -44,11 +44,7 @@ export const ReplyingTo = ({
                                         />
                                     )}
 
-                                {(!replyingTo?.media || replyingTo.media.length < 1) && normalizeMessageContent(
-                                    replyingTo?.content ?? "",
-                                    replyingTo?.replyingToEmoteUrls,
-                                    true
-                                )}
+                                {(!replyingTo?.media || replyingTo.media.length < 1) && normalizeMessage(replyingTo!.content, "reply")}
                             </span>
                         </div>
                         <Button

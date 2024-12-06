@@ -1,4 +1,4 @@
-import { normalizeMessageContent } from "@/lib/normalizeMessage";
+import { normalizeMessage } from "@/lib/normalizeMessage";
 import { cn } from "@/lib/utils";
 import { Message } from "@/models";
 
@@ -24,14 +24,7 @@ const RepliedToBubble = ({ message, isMyMessage }: Props) => {
                 <img className="w-32 h-52 rounded object-cover" src={message.replyingToMedia[0]} alt="" loading="lazy" />
             )}
             <div>
-                {
-                    normalizeMessageContent(
-                        message.replyingToContent!,
-                        message.replyingToEmoteUrls,
-                        true,
-                        isMyMessage
-                    )
-                }
+                {normalizeMessage(message.replyingToContent!, "reply")}
             </div>
         </div>
     )

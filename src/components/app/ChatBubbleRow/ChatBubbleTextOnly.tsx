@@ -1,6 +1,7 @@
-import { normalizeMessageContent } from "@/lib/normalizeMessage";
+import { normalizeMessage } from "@/lib/normalizeMessage";
 import { cn } from "@/lib/utils";
 import { Message } from "@/models";
+import { memo } from "react";
 
 interface Props {
     message: Message;
@@ -26,16 +27,9 @@ const ChatBubbleTextOnly = ({
                 }
             )}
         >
-            {
-                normalizeMessageContent(
-                    message.content,
-                    message.emoteUrls,
-                    false,
-                    isMyMessage
-                )
-            }
+            {normalizeMessage(message.content)}
         </div>
     )
 }
 
-export default ChatBubbleTextOnly;
+export default memo(ChatBubbleTextOnly);
