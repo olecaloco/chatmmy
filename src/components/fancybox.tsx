@@ -20,7 +20,7 @@ const Fancybox = (props: any) => {
         };
     });
 
-    return <div ref={containerRef}>{props.children}</div>;
+    return <div className="flex-1 relative overflow-hidden" ref={containerRef}>{props.children}</div>;
 }
 
 export default Fancybox;
