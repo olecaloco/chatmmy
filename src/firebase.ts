@@ -1,5 +1,5 @@
 import { getApp, getApps, initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { initializeFirestore, memoryLocalCache } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { getStorage } from "firebase/storage";
 import { getMessaging, getToken, isSupported } from "firebase/messaging";
@@ -15,7 +15,7 @@ const firebaseConfig = {
 };
 
 const firebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-export const db = getFirestore(firebaseApp);
+export const db = initializeFirestore(firebaseApp, { localCache: memoryLocalCache() });
 export const auth = getAuth(firebaseApp);
 export const storage = getStorage(firebaseApp);
 
@@ -41,12 +41,12 @@ export const fetchToken = async () => {
     }
 };
 
-// if (import.meta.env.DEV) {
-//     const { connectAuthEmulator } = await import("firebase/auth");
-//     const { connectFirestoreEmulator } = await import("firebase/firestore");
-//     const { connectStorageEmulator } = await import("firebase/storage");
+if (import.meta.env.DEV) {
+    const { connectAuthEmulator } = await import("firebase/auth");
+    const { connectFirestoreEmulator } = await import("firebase/firestore");
+    const { connectStorageEmulator } = await import("firebase/storage");
 
-//     connectAuthEmulator(auth, "http://localhost:9099", { disableWarnings: true });
-//     connectFirestoreEmulator(db, "localhost", 8080);
-//     connectStorageEmulator(storage, "127.0.0.1", 9199);
-// }
+    connectAuthEmulator(auth, "http://localhost:9099", { disableWarnings: true });
+    connectFirestoreEmulator(db, "localhost", 8080);
+    connectStorageEmulator(storage, "127.0.0.1", 9199);
+}

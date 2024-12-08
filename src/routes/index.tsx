@@ -8,7 +8,7 @@ import {
     getChatSnapshot,
     getEmotes,
     sendMessageToDb,
-    sendNotificationViaFCM,
+    sendNotification,
     uploadFile,
 } from "@/lib/api";
 import { Emote_API, Message } from "@/models";
@@ -157,7 +157,7 @@ function Index() {
                         const body = !data.content && data.media ? "An image has been posted" : data.content.trim()
 
                         userData.tokens.forEach(token => {
-                            sendNotificationViaFCM(token, "A New Message", body);
+                            sendNotification(token, "A New Message", body, user?.photoURL);
                         });
                     })
                     .catch(e => console.error(e));

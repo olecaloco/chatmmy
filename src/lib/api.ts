@@ -90,30 +90,32 @@ export async function uploadFile(file: File) {
 export async function saveDeviceToken(token: string) {
     const user = auth.currentUser;
 
-    if (user) {
-        const user_uid = user.uid === "8fn9OA8aMjSWiP9VxOB0PxkiBvj2" ? "UcqmsUDy1cXzBYyPOX12NqwaLpc2" : "8fn9OA8aMjSWiP9VxOB0PxkiBvj2"
-        const userRef = doc(db, "users", user_uid);  // Reference to the user's document in the 'users' collection
+    if (!user) return;
+    
+    const usersRef = collection(db, "users");
 
-        try {
-            const doc = await getDoc(userRef);
-            const data = doc.exists() ? doc.data() : null;
+    try {
+        const snapshot = await getDocs(usersRef);
 
-            if (data) {
-                const tokens = [...data.tokens, token];
-                const tokenSet = new Set(tokens);
-                const filteredTokens = [...tokenSet];
+        if (snapshot.empty) throw new Error("No users found!");
 
-                await updateDoc(userRef, { tokens: filteredTokens });
-            }
-        } catch (error) {
-            console.error("Error updating user's name in Firestore:", error);
-        }
-    } else {
-        console.log("No user is logged in.");
-    }
+        const doc = snapshot.docs.find(doc => doc.id !== user.uid);
+
+        if (!doc) throw new Error("User document not found!")
+        
+        const ref = doc.ref;
+        const data = doc.data();
+        const tokens = [...data.tokens, token];
+        const tokenSet = new Set(tokens);
+        const filteredTokens = [...tokenSet];
+        await updateDoc(ref, { tokens: filteredTokens });
+
+    } catch (error) {
+        console.error("Error updating user's name in Firestore:", error);
+    }   
 }
 
-export async function sendNotificationViaFCM(token: string, title: string, message: string) {
+export async function sendNotification(token: string, title: string, message: string, icon?: string | null) {
     return fetch("https://chatmmy-notifier.onrender.com/send-notification", {
         method: "POST",
         headers: {
@@ -123,7 +125,8 @@ export async function sendNotificationViaFCM(token: string, title: string, messa
             token: token,
             title: title,
             message: message,
-            link: "/",
+            icon: icon,
+            link: "https://chatmmy.edcbc.web.app",
         }),
     });
 }
