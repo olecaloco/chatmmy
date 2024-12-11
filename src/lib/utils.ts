@@ -1,3 +1,4 @@
+import { Message } from "@/models";
 import { type ClassValue, clsx } from "clsx"
 import { format, isToday } from "date-fns";
 import { twMerge } from "tailwind-merge"
@@ -30,3 +31,31 @@ export const formatTimestamp = (date?: Date): string => {
       return format(date, "MMM d, hh:mm a");
   }
 };
+
+export const processMessageData = (
+  value: string,
+  replyingTo: Message | null,
+  userId?: string
+) => {
+  const content = value.trim();
+  const now = new Date();
+
+  const data: any = {
+      content: content ?? "",
+      senderId: userId,
+      createdAt: now,
+      emoteUrls: [],
+      media: [],
+  };
+
+  if (replyingTo) {
+      data.replyingTo = replyingTo.id;
+      data.replyingToContent = replyingTo.content;
+      data.replyingToEmoteUrls = replyingTo.emoteUrls;
+      if (replyingTo.media) {
+          data.replyingToMedia = replyingTo.media;
+      }
+  }
+
+  return data;
+}

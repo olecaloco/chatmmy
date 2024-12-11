@@ -21,6 +21,7 @@ import { ReplyingTo } from "@/components/app/replyingTo";
 import { FilePreview } from "@/components/app/filePreview";
 import { FilePreview as FilePreviewInterface } from "@/lib/types";
 import useFcmToken from "@/hooks/use-fcm-token";
+import { processMessageData } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
     beforeLoad: ({ context, location }) => {
@@ -112,32 +113,8 @@ function Index() {
         return () => unsubscribe();
     }, [user]);
 
-    const processMessageData = (value: string) => {
-        const content = value.trim();
-        const now = new Date();
-
-        const data: any = {
-            content: content ?? "",
-            senderId: user?.uid,
-            createdAt: now,
-            emoteUrls: [],
-            media: [],
-        };
-
-        if (replyingTo) {
-            data.replyingTo = replyingTo.id;
-            data.replyingToContent = replyingTo.content;
-            data.replyingToEmoteUrls = replyingTo.emoteUrls;
-            if (replyingTo.media) {
-                data.replyingToMedia = replyingTo.media;
-            }
-        }
-
-        return data;
-    }
-
     const processContent = async (value: string, files: FileList | null) => {
-        const data = processMessageData(value);
+        const data = processMessageData(value, replyingTo, user?.uid);
 
         try {
             if (!isUploading && files && files[0]) {
