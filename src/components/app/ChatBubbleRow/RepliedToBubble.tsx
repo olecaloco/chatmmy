@@ -1,13 +1,14 @@
 import { normalizeMessage } from "@/lib/normalizeMessage";
 import { cn } from "@/lib/utils";
 import { Message } from "@/models";
+import { memo } from "react";
 
 interface Props {
     message: Message;
     isMyMessage: boolean;
 }
 
-const RepliedToBubble = ({ message, isMyMessage }: Props) => {
+const RepliedToBubble = memo(({ message, isMyMessage }: Props) => {
     const replyHasMedia = message.replyingToMedia && message.replyingToMedia.length > 0 ? true : false;
 
     return (
@@ -28,6 +29,12 @@ const RepliedToBubble = ({ message, isMyMessage }: Props) => {
             </div>
         </div>
     )
-}
+}, (previous, next) => {
+    if (previous.message.id !== next.message.id) {
+        return false;
+    }
+
+    return true;
+})
 
 export default RepliedToBubble;

@@ -1,10 +1,10 @@
 import { Message } from "@/models";
-import { ReactNode } from "react";
+import { memo, ReactNode } from "react";
 import ChatBubbleTextOnly from "./ChatBubbleTextOnly";
 import ChatBubbleMediaOnly from "./ChatBubbleMediaOnly";
 import ChatBubbleTextAndMedia from "./ChatBubbleTextAndMedia";
 
-const ChatBubble = ({ message, isMyMessage }: { message: Message; isMyMessage: boolean }) => {
+const ChatBubble = memo(({ message, isMyMessage }: { message: Message; isMyMessage: boolean }) => {
     let node: ReactNode = "";
     const messageHasMedia = message.media && message.media.length > 0 ? true : false;
 
@@ -18,6 +18,12 @@ const ChatBubble = ({ message, isMyMessage }: { message: Message; isMyMessage: b
     }
 
     return node;
-}
+}, (previous, next) => {
+    if (previous.message.id !== next.message.id) {
+        return false;
+    }
+
+    return true;
+})
 
 export default ChatBubble;
