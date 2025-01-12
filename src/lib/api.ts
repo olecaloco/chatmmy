@@ -42,9 +42,6 @@ export function getEmotes(callback: (response: any) => void) {
         .catch((err) => console.error(err));
 }
 
-export function setupEmotesHashmap(emotes: any) {
-    console.log(emotes);
-}
 
 export function getChatSnapshot(
     callback: (snapshot: QuerySnapshot<Message>) => void
