@@ -4,14 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuthContext } from "@/helpers/authContext";
 import {
-    fetchPreviousMessages,
     getChatSnapshot,
     getEmotes,
     sendMessageToDb,
     sendNotification,
     uploadFile,
 } from "@/lib/api";
-import { Emote_API, Message } from "@/models";
+import { Message } from "@/models";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { DocumentData } from "firebase/firestore";
 import { Image, Send } from "lucide-react";
@@ -45,46 +44,55 @@ function Index() {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const firstMessageDocRef = useRef<DocumentData | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
-    const emotesRef = useRef<Emote_API[]>([]);
+    const emotesRef = useRef<{[key: string]: string}>({});
 
     const [filePreviews, setFilePreviews] = useState<FilePreviewInterface[]>(
         []
     );
     const [isUploading, setIsUploading] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
-    const [loadingPrevious, setLoadingPrevious] = useState(false);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [incompleteEmote, setIncompleteEmote] = useState("");
     const [replyingTo, setReplyingTo] = useState<Message | null>(null);
 
     const navigate = useNavigate();
 
-    const suggestions = useMemo(
-        () =>
-            emotesRef.current.filter((e) => {
-                return e.name
-                    .toLowerCase()
-                    .includes(incompleteEmote.toLowerCase());
-            }),
-        [incompleteEmote]
-    );
+    const suggestions = useMemo(() => {
+        if (emotesRef.current) {
+            const keys = Object.keys(emotesRef.current);
+            const foundKeys = keys.filter(k => k.toLowerCase().includes(incompleteEmote));
+            return foundKeys.map(f => ({name: f, url: emotesRef.current[f]}));
+        } else {
+            return [];
+        }
+    }, [incompleteEmote]);
 
     useEffect(() => {
         if (user === null) navigate({ to: "/signin" });
     }, [navigate, user]);
 
     useEffect(() => {
-        const storedEmotes = window.localStorage.getItem("emotes");
-        if (!storedEmotes) {
-            getEmotes((response) => {
-                window.localStorage.setItem(
-                    "emotes",
-                    JSON.stringify(response.emotes)
-                );
-                emotesRef.current = response.emotes;
-            });
+        const storedEmotesMap = window.localStorage.getItem("emotesHashMap");
+
+        if (!storedEmotesMap) {
+            getEmotes(response => {
+                const hashmap: {[key: string]: string} = {};
+
+                for (let i = 0; i < response.emotes.length; i++) {
+                    const emoteObj = response.emotes[i];
+                    const emoteName = emoteObj.name;
+                    const emoteURL = emoteObj.data.host.url;
+
+                    hashmap[emoteName] = emoteURL;
+                }
+
+                emotesRef.current = hashmap;
+
+                const hashmapString = JSON.stringify(hashmap);
+                window.localStorage.setItem("emotesHashMap", hashmapString);
+            })
         } else {
-            const parsedEmotes = JSON.parse(storedEmotes);
+            const parsedEmotes = JSON.parse(storedEmotesMap);
             emotesRef.current = parsedEmotes;
         }
     }, []);
@@ -93,15 +101,7 @@ function Index() {
         if (!user) return;
 
         const unsubscribe = getChatSnapshot((snapshot) => {
-            if (isFirstFetch.current) {
-                setMessages(snapshot.docs.map(d => d.data()));
-            } else {
-                if (!snapshot.empty) {
-                    const firstSnapshot = snapshot.docs[0];
-                    const firstSnapshotData = firstSnapshot.data();
-                    setMessages(m => [firstSnapshotData, ...m]);
-                }
-            }
+            setMessages(snapshot.docs.map(d => d.data()));
 
             if (!snapshot.empty && !firstMessageDocRef.current) {
                 firstMessageDocRef.current = snapshot.docs[snapshot.size - 1];
@@ -208,21 +208,6 @@ function Index() {
         inputRef.current?.focus();
     };
 
-    const handleLoadMore = async () => {
-        if (!firstMessageDocRef.current) return;
-
-        setLoadingPrevious(true);
-        const documents = await fetchPreviousMessages(firstMessageDocRef.current);
-
-        if (!documents.empty) {
-            const _messages = documents.docs.map((d) => d.data());
-            firstMessageDocRef.current = documents.docs[documents.size - 1];
-            setMessages((m) => [...m, ..._messages]);
-        }
-
-        setLoadingPrevious(false);
-    };
-
     if (!user) return null;
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -287,8 +272,6 @@ function Index() {
             <Messages
                 messages={messages}
                 onReply={onReply}
-                handleLoadMore={handleLoadMore}
-                loadMoreLoading={loadingPrevious}
             />
 
             <form className="relative" onSubmit={onSubmit}>

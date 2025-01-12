@@ -1,1 +1,1 @@
-export const DOC_LIMIT = 25;
+export const DOC_LIMIT = 50;

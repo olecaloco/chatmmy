@@ -5,7 +5,8 @@ export function normalizeMessage(message: string, type: "not-reply" | "reply" = 
 
     let contentParts = message.split(" ");
     const reply = type === "reply" ? true : false;
-    const emotesString = window.localStorage.getItem("emotes");
+    const emotesString = window.localStorage.getItem("emotesHashMap");
+    const emotes = emotesString ? JSON.parse(emotesString) : null;
 
     let _content = contentParts.map((word, index) => {
         if (isValidHttpUrl(word)) {
@@ -18,14 +19,12 @@ export function normalizeMessage(message: string, type: "not-reply" | "reply" = 
             </a>
         }
 
-        if (emotesString) {
-            const emotes = JSON.parse(emotesString);
-            const emote = emotes.find((e: any) => e.name === word);
+        if (emotes) {
+            const emote = emotes[word];
 
             if (emote) {
-                const url = emote.data.host.url;
                 const fileName = contentParts.length === 1 ? "2x.webp" : "1x.webp";
-                const fullPath = `${url}/${fileName}`;
+                const fullPath = `${emote}/${fileName}`;
 
                 return <img key={index} src={fullPath} alt={word} className={cn("inline-block", { "h-6": reply })} title={word} loading="lazy" />
             }

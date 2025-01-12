@@ -1,4 +1,3 @@
-import { Emote_API } from "@/models";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "../ui/button";
 import { memo } from "react";
@@ -7,7 +6,7 @@ export const Suggestions = memo(({
     suggestions,
     onSuggestionClick,
 }: {
-    suggestions: Emote_API[];
+    suggestions: {name: string, url: string}[];
     onSuggestionClick: (name: string) => void;
 }) => {
     return (
@@ -24,11 +23,11 @@ export const Suggestions = memo(({
                         variant={"ghost"}
                         onClick={() => onSuggestionClick(s.name)}
                         title={s.name}
-                        key={s.id}
+                        key={s.name}
                     >
                         <span className="flex items-center gap-2">
                             <img
-                                src={`${s.data.host.url}/1x.webp`}
+                                src={`${s.url}/1x.webp`}
                                 alt={s.name}
                                 loading="lazy"
                             />

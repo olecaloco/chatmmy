@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-    GoogleAuthProvider,
-    signInWithPopup,
     onAuthStateChanged as _onAuthStateChanged,
     signInWithEmailAndPassword,
 } from "firebase/auth";
@@ -17,16 +15,6 @@ export async function signInWithEmailPassword(email: string, password: string) {
         await signInWithEmailAndPassword(auth, email, password);
     } catch (error: any) {
         alert(error.message)
-        console.error("Error signing in with Google", error);
-    }
-}
-
-export async function signInWithGoogle() {
-    const provider = new GoogleAuthProvider();
-
-    try {
-        await signInWithPopup(auth, provider);
-    } catch (error) {
         console.error("Error signing in with Google", error);
     }
 }
