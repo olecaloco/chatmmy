@@ -40,8 +40,18 @@ function RootComponent() {
 
     const handleRefreshEmotes = () => {
         getEmotes((response) => {
-            window.localStorage.setItem("emotes", JSON.stringify(response.emotes));
-            window.location.reload();
+            const hashmap: {[key: string]: string} = {};
+
+                for (let i = 0; i < response.emotes.length; i++) {
+                    const emoteObj = response.emotes[i];
+                    const emoteName = emoteObj.name;
+                    const emoteURL = emoteObj.data.host.url;
+
+                    hashmap[emoteName] = emoteURL;
+                }
+
+                const hashmapString = JSON.stringify(hashmap);
+                window.localStorage.setItem("emotesHashMap", hashmapString);
         });
     };
 
