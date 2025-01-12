@@ -52,6 +52,7 @@ function RootComponent() {
 
                 const hashmapString = JSON.stringify(hashmap);
                 window.localStorage.setItem("emotesHashMap", hashmapString);
+                window.location.reload();
         });
     };
 
