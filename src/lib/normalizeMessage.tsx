@@ -26,7 +26,7 @@ export function normalizeMessage(message: string, type: "not-reply" | "reply" = 
                 const fileName = contentParts.length === 1 ? "2x.webp" : "1x.webp";
                 const fullPath = `${emote}/${fileName}`;
 
-                return <img key={index} src={fullPath} alt={word} className={cn("inline-block", { "h-6": reply })} title={word} loading="lazy" />
+                return <img key={index} src={fullPath} alt={word} className={cn("inline-block mx-1", { "h-6": reply })} title={word} loading="lazy" />
             }
         }
 
