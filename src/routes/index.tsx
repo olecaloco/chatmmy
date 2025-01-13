@@ -61,7 +61,7 @@ function Index() {
         if (emotesRef.current) {
             const keys = Object.keys(emotesRef.current);
             const foundKeys = keys.filter(k => k.toLowerCase().includes(incompleteEmote));
-            return foundKeys.map(f => ({name: f, url: emotesRef.current[f]}));
+            return foundKeys.sort().map(f => ({name: f, url: emotesRef.current[f]}));
         } else {
             return [];
         }
