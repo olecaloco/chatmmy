@@ -14,14 +14,14 @@ const ChatBubbleTextOnly = ({
 }: Props) => {
 
     const fragments = message.content.split(" ");
-    const stringEmotes = window.localStorage.getItem("emotes");
+    const stringEmotes = window.localStorage.getItem("emotesHashMap");
     const singleToken = fragments.length === 1 ? true : false;
     let emoteOnly = false;
 
 
     if (singleToken && stringEmotes) {
         const emotes = JSON.parse(stringEmotes);
-        const emote = emotes.find((e: any) => e.name === fragments[0]);
+        const emote = emotes[fragments[0]]
         if (emote) emoteOnly = true;
     }
 

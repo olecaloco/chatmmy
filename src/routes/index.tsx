@@ -61,7 +61,14 @@ function Index() {
         if (emotesRef.current) {
             const keys = Object.keys(emotesRef.current);
             const foundKeys = keys.filter(k => k.toLowerCase().includes(incompleteEmote));
-            return foundKeys.sort().map(f => ({name: f, url: emotesRef.current[f]}));
+            const sorted = [...foundKeys].sort((a, b) => {
+                const lowerA = a.toLowerCase();
+                const lowerB = b.toLowerCase();
+                if (lowerA < lowerB) return -1;
+                if (lowerA > lowerB) return 1;
+                return 0;
+            });
+            return sorted.map(f => ({name: f, url: emotesRef.current[f]}));
         } else {
             return [];
         }
