@@ -35,11 +35,36 @@ const converter: FirestoreDataConverter<Message> = {
     },
 };
 
-export function getEmotes(callback: (response: any) => void) {
-    fetch(`https://7tv.io/v3/emote-sets/${import.meta.env.VITE_7TV_CHANNEL_ID}`)
-        .then((data) => data.json())
-        .then(callback)
-        .catch((err) => console.error(err));
+export function createEmoteHashMap(emotes: any[]) {
+    const hashmap: {[key: string]: string} = {};
+
+    for (let i = 0; i < emotes.length; i++) {
+        const emoteObj = emotes[i];
+        const emoteName = emoteObj.name;
+        const emoteURL = emoteObj.data.host.url;
+
+        hashmap[emoteName] = emoteURL;
+    }
+
+    const hashmapString = JSON.stringify(hashmap);
+    window.localStorage.setItem("emotesHashMap", hashmapString);
+}
+
+export async function getEmotes() {
+    try {
+        const fetchGlobal = fetch("https://7tv.io/v3/emote-sets/global");
+        const fetchEmoteSet = fetch(`https://7tv.io/v3/emote-sets/${import.meta.env.VITE_7TV_CHANNEL_ID}`);
+
+        const [globalResponse, setResponse] = await Promise.all([fetchGlobal, fetchEmoteSet]);
+        const globalEmotes = await globalResponse.json();
+        const setEmotes = await setResponse.json();
+
+        const emotes = [...globalEmotes.emotes, ...setEmotes.emotes];
+        
+        return emotes;
+    } catch (error) {
+        console.error(error);
+    }
 }
 
 

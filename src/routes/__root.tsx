@@ -18,7 +18,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { EllipsisVertical } from "lucide-react";
 import { User } from "firebase/auth";
-import { getEmotes } from "@/lib/api";
+import { createEmoteHashMap, getEmotes } from "@/lib/api";
 import { Toaster } from "@/components/ui/sonner";
 
 interface MyRouterContext {
@@ -39,20 +39,15 @@ function RootComponent() {
     }
 
     const handleRefreshEmotes = () => {
-        getEmotes((response) => {
-            const hashmap: {[key: string]: string} = {};
+        getEmotes().then(emotes => {
+            if (!emotes) {
+                alert("Something went wrong retrieving the emotes");
+                return;
+            };
 
-                for (let i = 0; i < response.emotes.length; i++) {
-                    const emoteObj = response.emotes[i];
-                    const emoteName = emoteObj.name;
-                    const emoteURL = emoteObj.data.host.url;
+            createEmoteHashMap(emotes);
 
-                    hashmap[emoteName] = emoteURL;
-                }
-
-                const hashmapString = JSON.stringify(hashmap);
-                window.localStorage.setItem("emotesHashMap", hashmapString);
-                window.location.reload();
+            window.location.reload();
         });
     };
 

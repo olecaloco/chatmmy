@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuthContext } from "@/helpers/authContext";
 import {
+    createEmoteHashMap,
     getChatSnapshot,
     getEmotes,
     sendMessageToDb,
@@ -82,21 +83,9 @@ function Index() {
         const storedEmotesMap = window.localStorage.getItem("emotesHashMap");
 
         if (!storedEmotesMap) {
-            getEmotes(response => {
-                const hashmap: { [key: string]: string } = {};
-
-                for (let i = 0; i < response.emotes.length; i++) {
-                    const emoteObj = response.emotes[i];
-                    const emoteName = emoteObj.name;
-                    const emoteURL = emoteObj.data.host.url;
-
-                    hashmap[emoteName] = emoteURL;
-                }
-
-                emotesRef.current = hashmap;
-
-                const hashmapString = JSON.stringify(hashmap);
-                window.localStorage.setItem("emotesHashMap", hashmapString);
+            getEmotes().then(emotes => {
+                if (!emotes) return;
+                createEmoteHashMap(emotes);
             })
         } else {
             const parsedEmotes = JSON.parse(storedEmotesMap);
