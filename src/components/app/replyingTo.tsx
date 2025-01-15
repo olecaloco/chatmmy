@@ -44,7 +44,7 @@ export const ReplyingTo = ({
                                         />
                                     )}
 
-                                {(!replyingTo?.media || replyingTo.media.length < 1) && normalizeMessage(replyingTo?.content ?? "")}
+                                {(!replyingTo?.media || replyingTo.media.length < 1) && normalizeMessage(replyingTo?.content ?? "", "replying")}
                             </span>
                         </div>
                         <Button

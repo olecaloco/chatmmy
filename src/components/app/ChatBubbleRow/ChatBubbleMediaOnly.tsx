@@ -8,8 +8,8 @@ const ChatBubbleMediaOnly = ({ message }: Props) => {
     return (
         <>
             {message.media?.map((m, i) => (
-                <a key={i} href={m} data-fancybox="gallery">
-                    <img className="w-32 h-52 object-cover rounded" src={m} alt="" loading="lazy" />
+                <a key={i} draggable="false" href={m} data-fancybox="gallery">
+                    <img className="w-32 h-52 object-cover rounded" draggable="false" src={m} alt="" loading="lazy" />
                 </a>
             ))}
         </>
