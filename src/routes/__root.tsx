@@ -19,7 +19,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { EllipsisVertical } from "lucide-react";
 import { User } from "firebase/auth";
 import { createEmoteHashMap, getEmotes } from "@/lib/api";
-import { Toaster } from "@/components/ui/sonner";
 
 interface MyRouterContext {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -94,7 +93,6 @@ function RootComponent() {
                 </div>
             </div>
             <Outlet />
-            <Toaster position="top-right" />
         </div>
     );
 }
