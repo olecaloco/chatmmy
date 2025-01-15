@@ -105,10 +105,20 @@ export function sendMessageToDb(data: Message) {
  * @returns A string url for the uploaded image
  */
 export async function uploadFile(file: File) {
+    const fd = new FormData();
+    fd.append("image", file);
+
+    const data = await fetch("https://chatmmy-notifier.onrender.com/image-processing", {
+        "method": "POST",
+        body: fd
+    });
+
+    const blob = await data.blob()
+
     const now = new Date().getTime();
     const name = `${now}-${file.name}`
     const imageRef = ref(storage, name);
-    const snapshot = await uploadBytes(imageRef, file);
+    const snapshot = await uploadBytes(imageRef, blob);
     const url = await getDownloadURL(snapshot.ref);
     return url;
 }

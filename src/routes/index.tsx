@@ -14,7 +14,7 @@ import {
 import { Message } from "@/models";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { DocumentData } from "firebase/firestore";
-import { Image, Send } from "lucide-react";
+import { Image, LoaderCircle, Send } from "lucide-react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { ReplyingTo } from "@/components/app/replyingTo";
@@ -320,7 +320,7 @@ function Index() {
                     />
 
                     <Button className="rounded-full" title="Send" size="icon" disabled={isUploading}>
-                        <Send />
+                        {!isUploading ? <Send /> : <LoaderCircle className="animate-spin" />}
                     </Button>
                 </div>
             </form>
