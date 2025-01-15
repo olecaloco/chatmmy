@@ -9,27 +9,24 @@ interface Props {
 
 const ChatBubbleTextAndMedia = ({ message, isMyMessage }: Props) => {
     return (
-        <div
-            className={cn(
-                "p-2 rounded",
-                {
-                    "bg-primary text-primary-foreground": isMyMessage,
-                    "bg-muted": !isMyMessage,
-                }
-            )}
-        >
-
+        <>
             {message.media?.map((m, i) => (
-                <a key={i} href={m} data-fancybox="gallery">
-                    <img className="w-32 h-52 object-cover rounded" src={m} alt="" loading="lazy" />
+                <a key={i} href={m} draggable="false" data-fancybox="gallery">
+                    <img className="w-32 h-52 object-cover rounded" draggable="false" src={m} alt="" loading="lazy" />
                 </a>
             ))}
-
-
-            <div className="mt-2">
+            <div
+                className={cn(
+                    "p-2 rounded",
+                    {
+                        "bg-primary text-primary-foreground": isMyMessage,
+                        "bg-muted": !isMyMessage,
+                    }
+                )}
+            >
                 {normalizeMessage(message.content)}
             </div>
-        </div>
+        </>
     )
 }
 
