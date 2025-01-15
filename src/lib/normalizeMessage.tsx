@@ -1,10 +1,9 @@
-import { cn, isValidHttpUrl } from "./utils";
+import { isValidHttpUrl } from "./utils";
 
-export function normalizeMessage(message: string, type: "not-reply" | "reply" = "not-reply") {
+export function normalizeMessage(message: string) {
     if (!message) return;
 
     let contentParts = message.split(" ");
-    const reply = type === "reply" ? true : false;
     const emotesString = window.localStorage.getItem("emotesHashMap");
     const emotes = emotesString ? JSON.parse(emotesString) : null;
 
@@ -26,7 +25,7 @@ export function normalizeMessage(message: string, type: "not-reply" | "reply" = 
                 const fileName = contentParts.length === 1 ? "2x.webp" : "1x.webp";
                 const fullPath = `${emote}/${fileName}`;
 
-                return <img key={index} src={fullPath} alt={word} className={cn("inline-block mx-1", { "h-6": reply })} title={word} loading="lazy" />
+                return <img key={index} src={fullPath} alt={word} className="inline-block mx-1" title={word} loading="lazy" />
             }
         }
 
