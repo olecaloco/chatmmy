@@ -25,7 +25,7 @@ const RepliedToBubble = memo(({ message, isMyMessage }: Props) => {
                 <img className="w-32 h-52 rounded object-cover" src={message.replyingToMedia[0]} alt="" loading="lazy" />
             )}
             <div>
-                {normalizeMessage(message.replyingToContent!, "reply")}
+                {normalizeMessage(message.replyingToContent!)}
             </div>
         </div>
     )

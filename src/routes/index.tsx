@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuthContext } from "@/helpers/authContext";
 import {
+    createEmoteHashMap,
     getChatSnapshot,
     getEmotes,
     sendMessageToDb,
@@ -14,7 +15,7 @@ import {
 import { Message } from "@/models";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { DocumentData } from "firebase/firestore";
-import { Image, Send } from "lucide-react";
+import { Image, LoaderCircle, Send } from "lucide-react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { ReplyingTo } from "@/components/app/replyingTo";
@@ -45,7 +46,7 @@ function Index() {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const firstMessageDocRef = useRef<DocumentData | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
-    const emotesRef = useRef<{[key: string]: string}>({});
+    const emotesRef = useRef<{ [key: string]: string }>({});
 
     const [filePreviews, setFilePreviews] = useState<FilePreviewInterface[]>(
         []
@@ -61,7 +62,7 @@ function Index() {
     const suggestions = useMemo(() => {
         if (emotesRef.current) {
             const keys = Object.keys(emotesRef.current);
-            const foundKeys = keys.filter(k => k.toLowerCase().includes(incompleteEmote));
+            const foundKeys = keys.filter(k => k.toLowerCase().includes(incompleteEmote.toLowerCase()));
             const sorted = [...foundKeys].sort((a, b) => {
                 const lowerA = a.toLowerCase();
                 const lowerB = b.toLowerCase();
@@ -69,7 +70,7 @@ function Index() {
                 if (lowerA > lowerB) return 1;
                 return 0;
             });
-            return sorted.map(f => ({name: f, url: emotesRef.current[f]}));
+            return sorted.map(f => ({ name: f, url: emotesRef.current[f] }));
         } else {
             return [];
         }
@@ -83,21 +84,9 @@ function Index() {
         const storedEmotesMap = window.localStorage.getItem("emotesHashMap");
 
         if (!storedEmotesMap) {
-            getEmotes(response => {
-                const hashmap: {[key: string]: string} = {};
-
-                for (let i = 0; i < response.emotes.length; i++) {
-                    const emoteObj = response.emotes[i];
-                    const emoteName = emoteObj.name;
-                    const emoteURL = emoteObj.data.host.url;
-
-                    hashmap[emoteName] = emoteURL;
-                }
-
-                emotesRef.current = hashmap;
-
-                const hashmapString = JSON.stringify(hashmap);
-                window.localStorage.setItem("emotesHashMap", hashmapString);
+            getEmotes().then(emotes => {
+                if (!emotes) return;
+                createEmoteHashMap(emotes);
             })
         } else {
             const parsedEmotes = JSON.parse(storedEmotesMap);
@@ -335,7 +324,7 @@ function Index() {
                     />
 
                     <Button className="rounded-full" title="Send" size="icon" disabled={isUploading}>
-                        <Send />
+                        {!isUploading ? <Send /> : <LoaderCircle className="animate-spin" />}
                     </Button>
                 </div>
             </form>

@@ -33,7 +33,17 @@ export const Messages = memo(({
     const debounced = useDebouncedCallback(handleScroll, 250);
 
     return (
-        <Fancybox options={{ placeFocusBack: false, Carousel: { infinite: false } }}>
+        <Fancybox
+            options={{
+                placeFocusBack: false,
+                Toolbar: {
+                    display: {
+                        right: ["zoomIn", "download", "close"]
+                    }
+                },
+                Carousel: { infinite: false }
+            }}
+        >
             <ScrollToBottomButton showButton={showButton} scrollToBottom={scrollToBottom} />
             <div
                 ref={scrollableRef}

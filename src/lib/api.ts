@@ -37,11 +37,36 @@ const converter: FirestoreDataConverter<Message> = {
     },
 };
 
-export function getEmotes(callback: (response: any) => void) {
-    fetch(`https://7tv.io/v3/emote-sets/${import.meta.env.VITE_7TV_CHANNEL_ID}`)
-        .then((data) => data.json())
-        .then(callback)
-        .catch((err) => console.error(err));
+export function createEmoteHashMap(emotes: any[]) {
+    const hashmap: {[key: string]: string} = {};
+
+    for (let i = 0; i < emotes.length; i++) {
+        const emoteObj = emotes[i];
+        const emoteName = emoteObj.name;
+        const emoteURL = emoteObj.data.host.url;
+
+        hashmap[emoteName] = emoteURL;
+    }
+
+    const hashmapString = JSON.stringify(hashmap);
+    window.localStorage.setItem("emotesHashMap", hashmapString);
+}
+
+export async function getEmotes() {
+    try {
+        const fetchGlobal = fetch("https://7tv.io/v3/emote-sets/global");
+        const fetchEmoteSet = fetch(`https://7tv.io/v3/emote-sets/${import.meta.env.VITE_7TV_CHANNEL_ID}`);
+
+        const [globalResponse, setResponse] = await Promise.all([fetchGlobal, fetchEmoteSet]);
+        const globalEmotes = await globalResponse.json();
+        const setEmotes = await setResponse.json();
+
+        const emotes = [...globalEmotes.emotes, ...setEmotes.emotes];
+        
+        return emotes;
+    } catch (error) {
+        console.error(error);
+    }
 }
 
 
@@ -86,10 +111,20 @@ export async function sendMessageToDb(data: Message) {
  * @returns A string url for the uploaded image
  */
 export async function uploadFile(file: File) {
+    const fd = new FormData();
+    fd.append("image", file);
+
+    const data = await fetch("https://chatmmy-notifier.onrender.com/image-processing", {
+        "method": "POST",
+        body: fd
+    });
+
+    const blob = await data.blob()
+
     const now = new Date().getTime();
     const name = `${now}-${file.name}`
     const imageRef = ref(storage, name);
-    const snapshot = await uploadBytes(imageRef, file);
+    const snapshot = await uploadBytes(imageRef, blob);
     const url = await getDownloadURL(snapshot.ref);
     return url;
 }

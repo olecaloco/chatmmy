@@ -29,22 +29,21 @@ export const ReplyingTo = ({
             item && (
                 <animated.div style={style} className="overflow-hidden">
                     <div className="flex items-center justify-between px-4 py-2 mt-2 bg-muted overflow-hidden">
-                        <div className="flex items-center flex-1 truncate">
+                        <div className="flex gap-2 items-center flex-1 truncate">
                             <span className="text-xs font-bold mr-2">
                                 Replying To:
                             </span>
+                            {(replyingTo?.media &&
+                                replyingTo?.media.length > 0) && (
+                                    <img
+                                        className="w-12 h-12 object-cover"
+                                        src={replyingTo.media[0]}
+                                        alt=""
+                                        loading="lazy"
+                                    />
+                                )}
                             <span className="text-sm">
-                                {(replyingTo?.media &&
-                                    replyingTo?.media.length > 0) && (
-                                        <img
-                                            className="w-12 h-12 object-cover"
-                                            src={replyingTo.media[0]}
-                                            alt=""
-                                            loading="lazy"
-                                        />
-                                    )}
-
-                                {(!replyingTo?.media || replyingTo.media.length < 1) && normalizeMessage(replyingTo?.content ?? "", "reply")}
+                                {normalizeMessage(replyingTo?.content ?? "", "replying")}
                             </span>
                         </div>
                         <Button
