@@ -1,6 +1,6 @@
 import { normalizeMessage } from "@/lib/normalizeMessage";
 import { cn } from "@/lib/utils";
-import { Message } from "@/models";
+import { Message, STATUS } from "@/models";
 
 interface Props {
     message: Message;
@@ -13,6 +13,7 @@ const ChatBubbleTextAndMedia = ({ message, isMyMessage }: Props) => {
             className={cn(
                 "p-2 rounded",
                 {
+                    "opacity-50": isMyMessage && message.status === STATUS.SENDING,
                     "bg-primary text-primary-foreground": isMyMessage,
                     "bg-muted": !isMyMessage,
                 }

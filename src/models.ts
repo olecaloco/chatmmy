@@ -2,6 +2,12 @@ export interface EmoteUrl {
     [key: string]: string;
 }
 
+export enum STATUS {
+    SENT = "SENT",
+    SENDING = "SENDING",
+    FAILED = "FAILED"
+}
+
 export interface Message {
     id: string;
     senderId: string;
@@ -13,6 +19,7 @@ export interface Message {
     replyingToContent?: string;
     replyingToEmoteUrls?: EmoteUrl[];
     replyingToMedia?: string[];
+    status?: STATUS
 }
 
 export interface Emote_API {

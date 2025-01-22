@@ -1,10 +1,11 @@
 import { auth, db, storage } from "@/firebase";
-import { Message } from "@/models";
+import { Message, STATUS } from "@/models";
 import {
     addDoc,
     collection,
     doc,
     DocumentData,
+    DocumentReference,
     FirestoreDataConverter,
     getDoc,
     getDocs,
@@ -30,6 +31,7 @@ const converter: FirestoreDataConverter<Message> = {
         return {
             ...data,
             createdAt: createdAt ? createdAt.toDate() : createdAt,
+            status: data.status ? data.status : STATUS.SENT,
             id: snapshot.id,
         };
     },
@@ -70,7 +72,11 @@ export function fetchPreviousMessages(doc: DocumentData) {
     return getDocs(q);
 }
 
-export function sendMessageToDb(data: Message) {
+export async function updateMessageStatus(ref: DocumentReference) {
+    return updateDoc(ref, { status: STATUS.SENT })
+}
+
+export async function sendMessageToDb(data: Message) {
     return addDoc(collection(db, "messages"), data);
 }
 

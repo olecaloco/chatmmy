@@ -1,4 +1,4 @@
-import { Message } from "@/models";
+import { Message, STATUS } from "@/models";
 import { type ClassValue, clsx } from "clsx"
 import { format, isToday } from "date-fns";
 import { twMerge } from "tailwind-merge"
@@ -46,6 +46,7 @@ export const processMessageData = (
       createdAt: now,
       emoteUrls: [],
       media: [],
+      status: STATUS.SENDING,
   };
 
   if (replyingTo) {

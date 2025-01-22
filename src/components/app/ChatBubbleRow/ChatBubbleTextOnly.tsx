@@ -1,6 +1,6 @@
 import { normalizeMessage } from "@/lib/normalizeMessage";
 import { cn } from "@/lib/utils";
-import { Message } from "@/models";
+import { Message, STATUS } from "@/models";
 import { memo } from "react";
 
 interface Props {
@@ -30,6 +30,7 @@ const ChatBubbleTextOnly = ({
             className={cn(
                 "p-2 rounded",
                 {
+                    "opacity-50": isMyMessage && !emoteOnly && message.status === STATUS.SENDING,
                     "bg-primary text-primary-foreground": isMyMessage && !emoteOnly,
                     "bg-muted": !isMyMessage && !emoteOnly,
                 }
