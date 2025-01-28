@@ -9,7 +9,6 @@ import {
     getEmotes,
     sendMessageToDb,
     sendNotification,
-    updateMessageStatus,
     uploadFile,
 } from "@/lib/api";
 import { Message } from "@/models";
@@ -124,18 +123,15 @@ function Index() {
         } finally {
             if (!isUploading) {
                 sendMessageToDb(data)
-                    .then((ref) => {
-                        updateMessageStatus(ref).then(() => {
-                            if (notificationPermissionStatus !== "granted") return;
-                            if (!userData || !userData.tokens || userData.tokens.length === 0) return;
+                    .then(() => {
+                        if (notificationPermissionStatus !== "granted") return;
+                        if (!userData || !userData.tokens || userData.tokens.length === 0) return;
 
-                            const body = !data.content && data.media ? "An image has been posted" : data.content.trim()
+                        const body = !data.content && data.media ? "An image has been posted" : data.content.trim()
 
-                            userData.tokens.forEach(token => {
-                                sendNotification(token, "A New Message", body, user?.photoURL);
-                            });
-                        })
-                        .catch(e => console.error(e));
+                        userData.tokens.forEach(token => {
+                            sendNotification(token, "A New Message", body, user?.photoURL);
+                        });
                     })
                     .catch(e => console.error(e));
             }
@@ -282,10 +278,12 @@ function Index() {
                     />
                 )}
 
-                <ReplyingTo
-                    replyingTo={replyingTo}
-                    setReplyingTo={setReplyingTo}
-                />
+                {replyingTo && (
+                    <ReplyingTo
+                        replyingTo={replyingTo}
+                        setReplyingTo={setReplyingTo}
+                    />
+                )}
 
                 <FilePreview
                     isUploading={isUploading}

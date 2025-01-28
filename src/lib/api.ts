@@ -1,11 +1,10 @@
 import { auth, db, storage } from "@/firebase";
-import { Message, STATUS } from "@/models";
+import { Message } from "@/models";
 import {
     addDoc,
     collection,
     doc,
     DocumentData,
-    DocumentReference,
     FirestoreDataConverter,
     getDoc,
     getDocs,
@@ -31,7 +30,6 @@ const converter: FirestoreDataConverter<Message> = {
         return {
             ...data,
             createdAt: createdAt ? createdAt.toDate() : createdAt,
-            status: data.status ? data.status : STATUS.SENT,
             id: snapshot.id,
         };
     },
@@ -97,10 +95,6 @@ export function fetchPreviousMessages(doc: DocumentData) {
     return getDocs(q);
 }
 
-export async function updateMessageStatus(ref: DocumentReference) {
-    return updateDoc(ref, { status: STATUS.SENT })
-}
-
 export async function sendMessageToDb(data: Message) {
     return addDoc(collection(db, "messages"), data);
 }
@@ -158,6 +152,7 @@ export async function saveDeviceToken(token: string) {
 }
 
 export async function sendNotification(token: string, title: string, message: string, icon?: string | null) {
+    return;
     return fetch("https://chatmmy-notifier.onrender.com/send-notification", {
         method: "POST",
         headers: {

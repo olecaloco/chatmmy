@@ -41,7 +41,7 @@ export const Suggestions = memo(({
 }, (prev, next) => {
     if (prev.suggestions.length === next.suggestions.length) {
         return true;
-    } else {
-        return false;
     }
+
+    return false;
 });

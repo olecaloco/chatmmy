@@ -21,8 +21,6 @@ const ChatBubble = memo(({ message, isMyMessage }: { message: Message; isMyMessa
 }, (previous, next) => {
     if (previous.message.id !== next.message.id) {
         return false;
-    } else if (previous.message.status !== next.message.status) {
-        return false;
     }
 
     return true;
