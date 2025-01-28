@@ -152,7 +152,6 @@ export async function saveDeviceToken(token: string) {
 }
 
 export async function sendNotification(token: string, title: string, message: string, icon?: string | null) {
-    return;
     return fetch("https://chatmmy-notifier.onrender.com/send-notification", {
         method: "POST",
         headers: {
