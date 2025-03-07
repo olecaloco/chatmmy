@@ -14,7 +14,7 @@ export const ReplyingTo = ({
         <div className="overflow-hidden">
             <div className="flex items-center justify-between px-4 py-2 mt-2 bg-muted overflow-hidden">
                 <div className="flex gap-2 items-center flex-1 truncate">
-                    <span className="text-xs font-bold mr-2">
+                    <span className="text-xs font-bold">
                         Replying To:
                     </span>
                     {(replyingTo?.media &&
