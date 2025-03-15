@@ -1,10 +1,13 @@
 import { auth, db, storage } from "@/firebase";
-import { Message } from "@/models";
+import { Checklist, Message } from "@/models";
 import {
     addDoc,
     collection,
+    deleteDoc,
     doc,
     DocumentData,
+    DocumentReference,
+    DocumentSnapshot,
     FirestoreDataConverter,
     getDoc,
     getDocs,
@@ -14,6 +17,7 @@ import {
     query,
     QueryDocumentSnapshot,
     QuerySnapshot,
+    setDoc,
     startAfter,
     Timestamp,
     updateDoc,
@@ -34,6 +38,18 @@ const converter: FirestoreDataConverter<Message> = {
         };
     },
 };
+
+const checklistConverter: FirestoreDataConverter<Checklist> = {
+    toFirestore: (checklist) => checklist,
+    fromFirestore: (snapshot: QueryDocumentSnapshot<Checklist>, options) => {
+        const data = snapshot.data(options);
+        
+        return {
+            ...data,
+            id: snapshot.id
+        } as Checklist
+    }
+}
 
 export function createEmoteHashMap(emotes: any[]) {
     const hashmap: {[key: string]: string} = {};
@@ -165,4 +181,41 @@ export async function sendNotification(token: string, title: string, message: st
             link: "https://chatmmy.edcbc.web.app",
         }),
     });
+}
+
+export function getChecklistsSnapshot(
+    callback: (snapshot: QuerySnapshot<Checklist>) => void
+) {
+    const q = query(
+        collection(db, "checklists"),
+        orderBy("createdAt", "desc"),
+        limit(DOC_LIMIT)
+    ).withConverter(checklistConverter);
+
+    return onSnapshot(q, callback);
+}
+
+export async function getChecklist(id: string) {
+    const d = doc(db, `checklists/${id}`).withConverter(checklistConverter);
+    const snapshot = await getDoc(d);
+
+    if (!snapshot.exists()) return undefined;
+
+    return snapshot.data();
+}
+
+export async function saveChecklist(checklist: Checklist, id?: string): Promise<string> {
+    if (!id) {
+        const document = await addDoc(collection(db, "checklists"), checklist);
+        return document.id;
+    } else {
+        const d = doc(db, `checklists/${id}`);
+        await setDoc(d, checklist, { merge: true });
+        return id;
+    }
+}
+
+export async function deleteChecklist(id: string) {
+    const d = doc(db, `checklists/${id}`);
+    await deleteDoc(d);
 }

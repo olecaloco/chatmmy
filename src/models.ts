@@ -27,3 +27,17 @@ export interface Emote_API {
     name: string;
     data: any;
 }
+
+export interface Checklist {
+    id?: string;
+    title?: string;
+    items: ChecklistItem[];
+    createdAt: number;
+    createdBy: string;
+}
+
+export interface ChecklistItem {
+    id: number;
+    checked: boolean;
+    content: string;
+}
