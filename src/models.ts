@@ -30,7 +30,7 @@ export interface Emote_API {
 
 export interface Checklist {
     id?: string;
-    title?: string;
+    title: string;
     items: ChecklistItem[];
     createdAt: number;
     createdBy: string;

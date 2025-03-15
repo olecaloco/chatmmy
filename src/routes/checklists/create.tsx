@@ -1,11 +1,14 @@
 import { ChecklistForm } from "@/components/checklists/ChecklistForm";
+import { Button } from "@/components/ui/button";
 import {
     Dialog,
     DialogContent,
+    DialogFooter,
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Loader2Icon } from "lucide-react";
 import { useState } from "react";
 
 export const Route = createFileRoute("/checklists/create")({
@@ -31,9 +34,19 @@ function RouteComponent() {
                     <DialogTitle>Create new checklist</DialogTitle>
                 </DialogHeader>
                 <ChecklistForm
+                    id="createForm"
                     loading={loading}
                     updateLoadingState={updateLoadingState}
                 />
+                <DialogFooter>
+                    <Button disabled={loading} type="submit" form="createForm">
+                        {loading ? (
+                            <Loader2Icon className="animate-spin" />
+                        ) : (
+                            "Save"
+                        )}
+                    </Button>
+                </DialogFooter>
             </DialogContent>
         </Dialog>
     );

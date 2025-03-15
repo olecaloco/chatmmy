@@ -68,14 +68,30 @@ function RouteComponent() {
                     loading={loading}
                     updateLoadingState={updateLoadingState}
                 />
-                <DialogFooter>
+                <DialogFooter className="mt-10 justify-between">
                     <Button
-                        className="mt-10 w-[150px]"
-                        variant="destructive"
+                        className="text-red-700"
+                        variant="ghost"
                         disabled={deleting}
+                        type="button"
                         onClick={onDeleteChecklist}
                     >
-                        {deleting ? <Loader2Icon className="animate-spin" /> : "Delete Checklist"}
+                        {deleting ? (
+                            <Loader2Icon className="animate-spin" />
+                        ) : (
+                            "Delete"
+                        )}
+                    </Button>
+                    <Button
+                        disabled={loading}
+                        type="submit"
+                        form={checklist?.id}
+                    >
+                        {loading ? (
+                            <Loader2Icon className="animate-spin" />
+                        ) : (
+                            "Save"
+                        )}
                     </Button>
                 </DialogFooter>
             </DialogContent>

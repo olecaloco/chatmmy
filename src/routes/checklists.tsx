@@ -63,7 +63,7 @@ function Checklists() {
                                 <Link
                                     className="block px-2 py-1 shadow bg-muted rounded"
                                     to="/checklists/$id"
-                                    params={{ id: checklist.id }}
+                                    params={{ id: checklist.id! }}
                                 >
                                     <h4>{checklist.title}</h4>
                                     <span className="block text-muted-foreground text-sm">

@@ -6,8 +6,6 @@ import {
     deleteDoc,
     doc,
     DocumentData,
-    DocumentReference,
-    DocumentSnapshot,
     FirestoreDataConverter,
     getDoc,
     getDocs,
@@ -205,7 +203,7 @@ export async function getChecklist(id: string) {
 }
 
 export async function saveChecklist(checklist: Checklist, id?: string): Promise<string> {
-    if (!id) {
+    if (!id || id === "createForm") {
         const document = await addDoc(collection(db, "checklists"), checklist);
         return document.id;
     } else {

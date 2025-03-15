@@ -2,16 +2,15 @@ import { Checklist, ChecklistItem } from "@/models";
 import { Input } from "../ui/input";
 import { ChecklistFormItem } from "./ChecklistFormItem";
 import {
+    FormEvent,
     KeyboardEvent,
     useEffect,
     useRef,
     useState,
 } from "react";
 import { useAuthContext } from "@/helpers/authContext";
-import { deleteChecklist, saveChecklist } from "@/lib/api";
-import { useDebouncedCallback } from "use-debounce";
+import { saveChecklist } from "@/lib/api";
 import { useNavigate } from "@tanstack/react-router";
-import { Button } from "../ui/button";
 
 interface FormProps {
     id?: string;
@@ -24,7 +23,7 @@ export const ChecklistForm = ({ id, checklist, loading, updateLoadingState }: Fo
     const { user } = useAuthContext();
     const navigate = useNavigate();
     const itemInputRef = useRef<HTMLInputElement>(null);
-    const [title, setTitle] = useState<string>("");
+    const titleRef = useRef<HTMLInputElement>(null);
     const [items, setItems] = useState<ChecklistItem[]>([]);
 
     useEffect(() => {
@@ -32,13 +31,14 @@ export const ChecklistForm = ({ id, checklist, loading, updateLoadingState }: Fo
         setItems(checklist.items);
     }, [checklist]);
 
-    const onSubmit = async (
-        title: string,
-        items: ChecklistItem[]
-    ): Promise<void> => {
+    const onSubmit = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
+        event.preventDefault();
+
         if (loading) return;
 
         updateLoadingState(true);
+
+        const title = titleRef.current?.value ?? "";
 
         const data: Omit<Checklist, "id"> = {
             title: title,
@@ -50,7 +50,7 @@ export const ChecklistForm = ({ id, checklist, loading, updateLoadingState }: Fo
         try {
             const newId = await saveChecklist(data, id);
 
-            if (!id) {
+            if (!id || id === "createForm") {
                 navigate({ to: `/checklists/$id`, params: { id: newId } })
             }
         } catch (error: any) {
@@ -81,7 +81,6 @@ export const ChecklistForm = ({ id, checklist, loading, updateLoadingState }: Fo
 
         setItems(data);
         itemInputRef.current!.value = "";
-        onSubmit(title, data);
     };
 
     const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -92,13 +91,6 @@ export const ChecklistForm = ({ id, checklist, loading, updateLoadingState }: Fo
         const { value } = event.currentTarget;
         addValueToItem(value);
     };
-
-    const onDebouncedTitleChange = useDebouncedCallback((value) => {
-        if (loading) return;
-
-        setTitle(value);
-        onSubmit(value, items);
-    }, 500);
 
     const onCheckedChange = async (id: number, checked: boolean) => {
         if (loading) return;
@@ -112,7 +104,6 @@ export const ChecklistForm = ({ id, checklist, loading, updateLoadingState }: Fo
         });
 
         setItems(itemsCopy);
-        onSubmit(title, itemsCopy);
     }
 
     const onItemRemove = (id: number) => {
@@ -120,22 +111,20 @@ export const ChecklistForm = ({ id, checklist, loading, updateLoadingState }: Fo
 
         const itemsCopy = items.filter((i) => i.id !== id);
         setItems(itemsCopy);
-        onSubmit(title, itemsCopy);
     };
 
     return (
-        <form className="mt-4">
+        <form id={id} className="mt-4" onSubmit={onSubmit}>
             <div className="mb-4">
                 <label className="inline-block mb-2" htmlFor="title">
                     Title
                 </label>
                 <Input
-                    title={title}
+                    ref={titleRef}
                     defaultValue={checklist?.title}
                     name="title"
                     type="text"
                     placeholder="My checklist"
-                    onChange={(e) => onDebouncedTitleChange(e.target.value)}
                     required
                 />
             </div>
