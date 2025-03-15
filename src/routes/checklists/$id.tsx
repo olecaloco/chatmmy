@@ -48,12 +48,17 @@ function RouteComponent() {
 
     const onDeleteChecklist = async () => {
         if (deleting) return;
+        if (!checklist) return;
+
+        const conf = confirm(`Are you sure you want to delete ${checklist.title}`);
+
+        if (!conf) return;
 
         setDeleting(true);
 
-        if (checklist && checklist.id) await deleteChecklist(checklist.id);
+        if (checklist.id) await deleteChecklist(checklist.id);
 
-        navigate({ to: "/checklists" });
+        navigate({ to: "/checklists" });        
     };
 
     return (

@@ -1,13 +1,7 @@
 import { Checklist, ChecklistItem } from "@/models";
 import { Input } from "../ui/input";
 import { ChecklistFormItem } from "./ChecklistFormItem";
-import {
-    FormEvent,
-    KeyboardEvent,
-    useEffect,
-    useRef,
-    useState,
-} from "react";
+import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import { useAuthContext } from "@/helpers/authContext";
 import { saveChecklist } from "@/lib/api";
 import { useNavigate } from "@tanstack/react-router";
@@ -19,7 +13,12 @@ interface FormProps {
     updateLoadingState: (state: boolean) => void;
 }
 
-export const ChecklistForm = ({ id, checklist, loading, updateLoadingState }: FormProps) => {
+export const ChecklistForm = ({
+    id,
+    checklist,
+    loading,
+    updateLoadingState,
+}: FormProps) => {
     const { user } = useAuthContext();
     const navigate = useNavigate();
     const itemInputRef = useRef<HTMLInputElement>(null);
@@ -31,7 +30,9 @@ export const ChecklistForm = ({ id, checklist, loading, updateLoadingState }: Fo
         setItems(checklist.items);
     }, [checklist]);
 
-    const onSubmit = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
+    const onSubmit = async (
+        event: FormEvent<HTMLFormElement>
+    ): Promise<void> => {
         event.preventDefault();
 
         if (loading) return;
@@ -51,7 +52,7 @@ export const ChecklistForm = ({ id, checklist, loading, updateLoadingState }: Fo
             const newId = await saveChecklist(data, id);
 
             if (!id || id === "createForm") {
-                navigate({ to: `/checklists/$id`, params: { id: newId } })
+                navigate({ to: `/checklists/$id`, params: { id: newId } });
             }
         } catch (error: any) {
             console.error(error);
@@ -95,7 +96,7 @@ export const ChecklistForm = ({ id, checklist, loading, updateLoadingState }: Fo
     const onCheckedChange = async (id: number, checked: boolean) => {
         if (loading) return;
 
-        const itemsCopy = items.map(item => {
+        const itemsCopy = items.map((item) => {
             if (item.id === id) {
                 item.checked = checked;
             }
@@ -104,7 +105,7 @@ export const ChecklistForm = ({ id, checklist, loading, updateLoadingState }: Fo
         });
 
         setItems(itemsCopy);
-    }
+    };
 
     const onItemRemove = (id: number) => {
         if (loading) return;
@@ -128,8 +129,10 @@ export const ChecklistForm = ({ id, checklist, loading, updateLoadingState }: Fo
                     required
                 />
             </div>
-            <div className="mb-4">
+
+            <div className="mb-4 h-[250px] overflow-y-auto">
                 <label className="inline-block mb-2">Items</label>
+
                 {items?.map((item) => (
                     <ChecklistFormItem
                         item={item}
@@ -144,7 +147,9 @@ export const ChecklistForm = ({ id, checklist, loading, updateLoadingState }: Fo
                 onKeyDown={onKeyDown}
                 placeholder="Enter text"
             />
-            <div className="mt-1 text-xs text-muted-foreground">Press Enter to add item</div>
+            <div className="mt-1 text-xs text-muted-foreground">
+                Press Enter to add item
+            </div>
         </form>
     );
 };
