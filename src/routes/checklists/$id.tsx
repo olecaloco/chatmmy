@@ -1,12 +1,5 @@
 import { ChecklistForm } from "@/components/checklists/ChecklistForm";
 import { Button } from "@/components/ui/button";
-import {
-    Dialog,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog";
 import { deleteChecklist, getChecklist } from "@/lib/api";
 import { Checklist } from "@/models";
 import {
@@ -34,13 +27,7 @@ function RouteComponent() {
         getChecklist(id).then((data) => {
             setChecklist(data);
         });
-    }, [id]);
-
-    const onOpenChange = () => {
-        if (loading) return;
-
-        navigate({ to: "/checklists" });
-    };
+    }, [id]);    
 
     const updateLoadingState = (newLoadingState: boolean) => {
         setLoading(newLoadingState);
