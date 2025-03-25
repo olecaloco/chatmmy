@@ -1,44 +1,40 @@
-import { useId } from "react";
+import { KeyboardEvent, useId } from "react";
 import { ChecklistItem } from "@/models";
 import { Checkbox } from "../ui/checkbox";
-import { Button } from "../ui/button";
-import { XIcon } from "lucide-react";
+import { Input } from "../ui/input";
 
 interface Props {
     item: ChecklistItem;
+    onKeyDown: (event: KeyboardEvent<HTMLInputElement>, id: number) => void;
+    onTextChange: (id: number, value: string) => void;
     onCheckedChange: (id: number, checked: boolean) => void;
-    onItemRemove: (id: number) => void;
 }
 
 export const ChecklistFormItem = ({
     item,
     onCheckedChange,
-    onItemRemove,
+    onTextChange,
+    onKeyDown
 }: Props) => {
     const id = useId();
 
     return (
-        <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-                <Checkbox
-                    id={id}
-                    defaultChecked={item.checked}
-                    onCheckedChange={(checked) =>
-                        onCheckedChange(item.id, Boolean(checked))
-                    }
-                />
-                <label htmlFor={id} className="">
-                    {item.content}
-                </label>
-            </div>
-            <Button
-                variant="ghost"
-                size="icon"
-                type="button"
-                onClick={() => onItemRemove(item.id)}
-            >
-                <XIcon className="w-5 h-5 text-red-700" />
-            </Button>
+        <div className="flex items-center space-x-2 flex-1">
+            <Checkbox
+                id={id}
+                defaultChecked={item.checked}
+                tabIndex={-1}
+                onCheckedChange={(checked) =>
+                    onCheckedChange(item.id, Boolean(checked))
+                }
+            />
+            <Input
+                className="flex-1 border-0"
+                value={item.content}
+                type="text"
+                onKeyDown={(e) => onKeyDown(e, item.id)}
+                onChange={(e) => onTextChange(item.id, e.target.value)}
+            />
         </div>
     );
 };

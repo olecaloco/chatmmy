@@ -50,7 +50,9 @@ function RouteComponent() {
         if (deleting) return;
         if (!checklist) return;
 
-        const conf = confirm(`Are you sure you want to delete ${checklist.title}`);
+        const conf = confirm(
+            `Are you sure you want to delete ${checklist.title}`
+        );
 
         if (!conf) return;
 
@@ -58,48 +60,39 @@ function RouteComponent() {
 
         if (checklist.id) await deleteChecklist(checklist.id);
 
-        navigate({ to: "/checklists" });        
+        navigate({ to: "/checklists" });
     };
 
     return (
-        <Dialog open={true} onOpenChange={onOpenChange}>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Update checklist</DialogTitle>
-                </DialogHeader>
-                <ChecklistForm
-                    id={checklist?.id}
-                    checklist={checklist}
-                    loading={loading}
-                    updateLoadingState={updateLoadingState}
-                />
-                <DialogFooter className="mt-10 justify-between">
-                    <Button
-                        className="text-red-700"
-                        variant="ghost"
-                        disabled={deleting}
-                        type="button"
-                        onClick={onDeleteChecklist}
-                    >
-                        {deleting ? (
-                            <Loader2Icon className="animate-spin" />
-                        ) : (
-                            "Delete"
-                        )}
-                    </Button>
-                    <Button
-                        disabled={loading}
-                        type="submit"
-                        form={checklist?.id}
-                    >
-                        {loading ? (
-                            <Loader2Icon className="animate-spin" />
-                        ) : (
-                            "Save"
-                        )}
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+        <div className="flex flex-col flex-1 justify-between px-4 pb-4">
+            <ChecklistForm
+                id={checklist?.id}
+                checklist={checklist}
+                loading={loading}
+                updateLoadingState={updateLoadingState}
+            />
+            <div className="flex items-center justify-between">
+                <Button
+                    className="text-red-700"
+                    variant="ghost"
+                    disabled={deleting}
+                    type="button"
+                    onClick={onDeleteChecklist}
+                >
+                    {deleting ? (
+                        <Loader2Icon className="animate-spin" />
+                    ) : (
+                        "Delete"
+                    )}
+                </Button>
+                <Button disabled={loading} type="submit" form={checklist?.id}>
+                    {loading ? (
+                        <Loader2Icon className="animate-spin" />
+                    ) : (
+                        "Save"
+                    )}
+                </Button>
+            </div>
+        </div>
     );
 }

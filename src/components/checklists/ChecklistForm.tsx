@@ -1,10 +1,18 @@
 import { Checklist, ChecklistItem } from "@/models";
 import { Input } from "../ui/input";
 import { ChecklistFormItem } from "./ChecklistFormItem";
-import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
+import {
+    ChangeEvent,
+    FormEvent,
+    KeyboardEvent,
+    useEffect,
+    useRef,
+    useState,
+} from "react";
 import { useAuthContext } from "@/helpers/authContext";
 import { saveChecklist } from "@/lib/api";
 import { useNavigate } from "@tanstack/react-router";
+import { Plus } from "lucide-react";
 
 interface FormProps {
     id?: string;
@@ -21,7 +29,6 @@ export const ChecklistForm = ({
 }: FormProps) => {
     const { user } = useAuthContext();
     const navigate = useNavigate();
-    const itemInputRef = useRef<HTMLInputElement>(null);
     const titleRef = useRef<HTMLInputElement>(null);
     const [items, setItems] = useState<ChecklistItem[]>([]);
 
@@ -61,36 +68,40 @@ export const ChecklistForm = ({
         }
     };
 
-    const addValueToItem = (value: string) => {
-        if (!value) return;
-
-        // Copied items values to itemsCopy to make it pseudo immutable
-        const itemsCopy = [...items];
-
-        // We'll take the last id from the stack
-        const lastItem = itemsCopy[itemsCopy.length - 1];
-        const lastItemId = lastItem?.id ?? 1;
-
-        const data: ChecklistItem[] = [
-            ...itemsCopy,
-            {
-                id: lastItemId + 1,
-                content: value,
-                checked: false,
-            },
-        ];
-
-        setItems(data);
-        itemInputRef.current!.value = "";
+    const focusLastItem = () => {
+        setTimeout(() => {
+            const itemsWrapperEl = document.getElementById("items")!;
+            const itemsEl =
+                itemsWrapperEl.querySelectorAll("input[type='text']");
+            (itemsEl[itemsEl.length - 1] as HTMLElement).focus();
+        }, 1);
     };
 
-    const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-        if (event.key !== "Enter") return;
+    const onKeyDown = (event: KeyboardEvent<HTMLInputElement>, id: number) => {
         if (loading) return;
 
-        event.preventDefault();
-        const { value } = event.currentTarget;
-        addValueToItem(value);
+        const BYPASS_KEYS = ["Backspace", "Enter"];
+
+        if (BYPASS_KEYS.includes(event.key)) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                const textInputs =
+                    document.querySelectorAll("input[type='text']");
+                (textInputs[textInputs.length - 1] as HTMLElement).focus();
+            } else if (event.key === "Backspace") {
+                if (event.currentTarget.value !== "") return;
+
+                const updated = items.filter((item) => item.id !== id);
+                setItems(updated);
+                focusLastItem();
+
+                if (updated.length === 0) {
+                    const textInputs =
+                        document.querySelectorAll("input[type='text']");
+                    (textInputs[textInputs.length - 1] as HTMLElement).focus();
+                }
+            }
+        }
     };
 
     const onCheckedChange = async (id: number, checked: boolean) => {
@@ -107,16 +118,63 @@ export const ChecklistForm = ({
         setItems(itemsCopy);
     };
 
-    const onItemRemove = (id: number) => {
-        if (loading) return;
+    const onTextChange = (id: number, value: string) => {
+        const current = [...items];
+        const updatedItems = current.map((item) => {
+            if (item.id === id) item.content = value;
+            return item;
+        });
 
-        const itemsCopy = items.filter((i) => i.id !== id);
-        setItems(itemsCopy);
+        setItems(updatedItems);
+    };
+
+    const onNewItemChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.currentTarget;
+
+        setItems((items) => {
+            if (items.length > 0) {
+                return [
+                    ...items,
+                    {
+                        id: items[items.length - 1].id + 1,
+                        checked: false,
+                        content: value,
+                    },
+                ];
+            } else {
+                return [
+                    {
+                        id: 1,
+                        checked: false,
+                        content: value,
+                    },
+                ];
+            }
+        });
+
+        focusLastItem();
+
+        event.currentTarget.value = "";
+    };
+
+    const onNewItemKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            return;
+        }
+
+        if (event.key === "Backspace") {
+            focusLastItem();
+        }
     };
 
     return (
-        <form id={id} className="mt-4" onSubmit={onSubmit}>
-            <div className="mb-4">
+        <form
+            id={id}
+            className="flex flex-col min-h-[1px] flex-1 overflow-hidden"
+            onSubmit={onSubmit}
+        >
+            <div className="my-4">
                 <label className="inline-block mb-2" htmlFor="title">
                     Title
                 </label>
@@ -130,25 +188,29 @@ export const ChecklistForm = ({
                 />
             </div>
 
-            <div className="mb-4 h-[250px] overflow-y-auto">
-                <label className="inline-block mb-2">Items</label>
+            <div id="wrapper" className="flex-1 overflow-y-auto mb-10">
+                <div id="items">
+                    {items?.map((item) => (
+                        <ChecklistFormItem
+                            item={item}
+                            key={item.id}
+                            onCheckedChange={onCheckedChange}
+                            onTextChange={onTextChange}
+                            onKeyDown={onKeyDown}
+                        />
+                    ))}
+                </div>
 
-                {items?.map((item) => (
-                    <ChecklistFormItem
-                        item={item}
-                        key={item.id}
-                        onCheckedChange={onCheckedChange}
-                        onItemRemove={onItemRemove}
+                <div className="flex items-center space-x-2">
+                    <Plus className="text-muted-foreground" />
+                    <Input
+                        className="px-0 border-0"
+                        type="text"
+                        placeholder="List Item"
+                        onKeyDown={onNewItemKeyDown}
+                        onChange={onNewItemChange}
                     />
-                ))}
-            </div>
-            <Input
-                ref={itemInputRef}
-                onKeyDown={onKeyDown}
-                placeholder="Enter text"
-            />
-            <div className="mt-1 text-xs text-muted-foreground">
-                Press Enter to add item
+                </div>
             </div>
         </form>
     );

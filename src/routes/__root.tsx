@@ -59,11 +59,10 @@ function RootComponent() {
         });
     };
 
-
     const onLinkClick = () => setOpen(false);
 
     return (
-        <Sheet open={open}>
+        <Sheet open={open} onOpenChange={setOpen}>
             <SheetContent className="w-[300px]" side="left">
                 <SheetHeader>
                     <SheetTitle>Chatmmy</SheetTitle>
@@ -72,6 +71,7 @@ function RootComponent() {
                 <nav className="mt-5 flex flex-col gap-4">
                     <Link onClick={onLinkClick} to="/">Chat</Link>
                     <Link onClick={onLinkClick} to="/checklists" search={{ id: undefined }}>Checklists</Link>
+                    <Link onClick={onLinkClick} to="/focus">Focus</Link>
                 </nav>
             </SheetContent>
 
