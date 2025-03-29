@@ -51,7 +51,7 @@ function RouteComponent() {
     };
 
     return (
-        <div className="flex flex-col flex-1 justify-between px-4 pb-4">
+        <div className="flex flex-col flex-1 justify-between px-4 pb-4 overflow-hidden">
             <ChecklistForm
                 id={checklist?.id}
                 checklist={checklist}
