@@ -4,6 +4,7 @@ import { deleteChecklist, getChecklist } from "@/lib/api";
 import { Checklist } from "@/models";
 import {
     createFileRoute,
+    Link,
     useNavigate,
     useParams,
 } from "@tanstack/react-router";
@@ -72,13 +73,18 @@ function RouteComponent() {
                         "Delete"
                     )}
                 </Button>
-                <Button disabled={loading} type="submit" form={checklist?.id}>
-                    {loading ? (
-                        <Loader2Icon className="animate-spin" />
-                    ) : (
-                        "Save"
-                    )}
-                </Button>
+                <div className="flex gap-1">
+                    <Button variant="ghost" asChild>
+                        <Link to="/checklists">Back</Link>
+                    </Button>
+                    <Button disabled={loading} type="submit" form={checklist?.id}>
+                        {loading ? (
+                            <Loader2Icon className="animate-spin" />
+                        ) : (
+                            "Save"
+                        )}
+                    </Button>
+                </div>
             </div>
         </div>
     );

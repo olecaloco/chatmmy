@@ -1,6 +1,6 @@
 import { ChecklistForm } from "@/components/checklists/ChecklistForm";
 import { Button } from "@/components/ui/button";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Loader2Icon } from "lucide-react";
 import { useState } from "react";
 
@@ -23,9 +23,14 @@ function RouteComponent() {
                 updateLoadingState={updateLoadingState}
             />
 
-            <Button disabled={loading} type="submit" form="createForm">
-                {loading ? <Loader2Icon className="animate-spin" /> : "Save"}
-            </Button>
+            <div className="flex justify-end gap-1">
+                <Button variant="ghost" asChild>
+                    <Link to="/checklists">Back</Link>
+                </Button>
+                <Button disabled={loading} type="submit" form="createForm">
+                    {loading ? <Loader2Icon className="animate-spin" /> : "Save"}
+                </Button>
+            </div>
         </div>
     );
 }
