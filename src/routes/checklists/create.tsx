@@ -1,10 +1,20 @@
 import { ChecklistForm } from "@/components/checklists/ChecklistForm";
 import { Button } from "@/components/ui/button";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { Loader2Icon } from "lucide-react";
 import { useState } from "react";
 
 export const Route = createFileRoute("/checklists/create")({
+    beforeLoad: ({ context, location }) => {
+        if (!context.user.user) {
+            throw redirect({
+                to: "/signin",
+                search: {
+                    redirect: location.href,
+                },
+            });
+        }
+    },
     component: RouteComponent,
 });
 
@@ -28,7 +38,11 @@ function RouteComponent() {
                     <Link to="/checklists">Back</Link>
                 </Button>
                 <Button disabled={loading} type="submit" form="createForm">
-                    {loading ? <Loader2Icon className="animate-spin" /> : "Save"}
+                    {loading ? (
+                        <Loader2Icon className="animate-spin" />
+                    ) : (
+                        "Save"
+                    )}
                 </Button>
             </div>
         </div>

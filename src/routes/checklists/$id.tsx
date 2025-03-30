@@ -5,6 +5,7 @@ import { Checklist } from "@/models";
 import {
     createFileRoute,
     Link,
+    redirect,
     useNavigate,
     useParams,
 } from "@tanstack/react-router";
@@ -12,6 +13,16 @@ import { Loader2Icon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export const Route = createFileRoute("/checklists/$id")({
+    beforeLoad: ({ context, location }) => {
+        if (!context.user.user) {
+            throw redirect({
+                to: "/signin",
+                search: {
+                    redirect: location.href,
+                },
+            });
+        }
+    },
     component: RouteComponent,
 });
 
@@ -28,7 +39,7 @@ function RouteComponent() {
         getChecklist(id).then((data) => {
             setChecklist(data);
         });
-    }, [id]);    
+    }, [id]);
 
     const updateLoadingState = (newLoadingState: boolean) => {
         setLoading(newLoadingState);
@@ -77,7 +88,11 @@ function RouteComponent() {
                     <Button variant="ghost" asChild>
                         <Link to="/checklists">Back</Link>
                     </Button>
-                    <Button disabled={loading} type="submit" form={checklist?.id}>
+                    <Button
+                        disabled={loading}
+                        type="submit"
+                        form={checklist?.id}
+                    >
                         {loading ? (
                             <Loader2Icon className="animate-spin" />
                         ) : (

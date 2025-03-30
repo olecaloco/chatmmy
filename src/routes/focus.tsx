@@ -1,3 +1,4 @@
+import { Timer } from "@/components/focus/timer";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/focus")({
@@ -15,5 +16,10 @@ export const Route = createFileRoute("/focus")({
 });
 
 function Focus() {
-    return <div className="px-4">Hello "/focus"!</div>;
+    return (
+        <div className="flex-1">
+            <div className="bg-yellow-600/80 text-black text-center py-2 mb-5">This is a work in progress</div>
+            <Timer />
+        </div>
+    );
 }
