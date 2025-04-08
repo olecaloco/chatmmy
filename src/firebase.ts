@@ -2,7 +2,7 @@ import { getApp, getApps, initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { getStorage } from "firebase/storage";
-import { getMessaging, getToken, isSupported } from "firebase/messaging";
+import { getMessaging, getToken, isSupported, onMessage } from "firebase/messaging";
 import { saveDeviceToken } from "./lib/api";
 
 const firebaseConfig = {
@@ -23,6 +23,13 @@ export const messaging = async () => {
     const supported = await isSupported();
     return supported ? getMessaging(firebaseApp) : null;
 };
+
+(async function() {
+    const m = await messaging();
+    if (!m) return;
+
+    onMessage(m, () => {});
+})();
 
 export const fetchToken = async () => {
     try {

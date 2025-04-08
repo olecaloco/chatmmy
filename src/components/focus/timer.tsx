@@ -1,21 +1,22 @@
 import { useMemo, useState } from "react";
 import { Slider } from "../ui/slider";
+import { MAX_HOURS, MAX_MINUTES } from "./constants";
 
 export const Timer = () => {
     const [hours, setHours] = useState<number>(0);
     const [minutes, setMinutes] = useState<number>(0);
 
-    const hoursInSeconds = useMemo(() => {
-        return 60 * 60 * hours;
-    }, [hours]);
+    // const hoursInSeconds = useMemo(() => {
+    //     return 60 * 60 * hours;
+    // }, [hours]);
 
-    const minutesInSeconds = useMemo(() => {
-        return 60 * minutes;
-    }, [minutes]);
+    // const minutesInSeconds = useMemo(() => {
+    //     return 60 * minutes;
+    // }, [minutes]);
 
-    const totalSeconds = useMemo(() => {
-        return hoursInSeconds + minutesInSeconds;
-    }, [hoursInSeconds, minutesInSeconds]);
+    // const totalSeconds = useMemo(() => {
+    //     return hoursInSeconds + minutesInSeconds;
+    // }, [hoursInSeconds, minutesInSeconds]);
 
     const formattedTTF = useMemo(() => {
         let hoursFormat = hours < 10 ? `0${hours}` : hours;
@@ -37,7 +38,7 @@ export const Timer = () => {
                 <label className="inline-block mb-3" htmlFor="hours">
                     Hours{" "}
                     <span className="text-xs text-muted-foreground">
-                        (24 hours max)
+                        ({MAX_HOURS} hours max)
                     </span>
                 </label>
                 <Slider
@@ -45,7 +46,7 @@ export const Timer = () => {
                     name="hours"
                     value={[hours]}
                     min={0}
-                    max={24}
+                    max={MAX_HOURS}
                     onValueChange={onHoursChange}
                 />
             </div>
@@ -53,7 +54,7 @@ export const Timer = () => {
                 <label className="inline-block mb-3" htmlFor="minutes">
                     Minutes{" "}
                     <span className="text-xs text-muted-foreground">
-                        (59 minutes max)
+                        ({MAX_MINUTES} minutes max)
                     </span>
                 </label>
                 <Slider
@@ -61,7 +62,7 @@ export const Timer = () => {
                     name="minutes"
                     value={[minutes]}
                     min={0}
-                    max={59}
+                    max={MAX_MINUTES}
                     onValueChange={onMinutesChange}
                 />
             </div>
