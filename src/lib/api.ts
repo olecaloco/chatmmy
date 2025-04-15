@@ -6,6 +6,7 @@ import {
     deleteDoc,
     doc,
     DocumentData,
+    DocumentSnapshot,
     FirestoreDataConverter,
     getDoc,
     getDocs,
@@ -41,16 +42,16 @@ const checklistConverter: FirestoreDataConverter<Checklist> = {
     toFirestore: (checklist) => checklist,
     fromFirestore: (snapshot: QueryDocumentSnapshot<Checklist>, options) => {
         const data = snapshot.data(options);
-        
+
         return {
             ...data,
-            id: snapshot.id
-        } as Checklist
-    }
-}
+            id: snapshot.id,
+        } as Checklist;
+    },
+};
 
 export function createEmoteHashMap(emotes: any[]) {
-    const hashmap: {[key: string]: string} = {};
+    const hashmap: { [key: string]: string } = {};
 
     for (let i = 0; i < emotes.length; i++) {
         const emoteObj = emotes[i];
@@ -67,20 +68,24 @@ export function createEmoteHashMap(emotes: any[]) {
 export async function getEmotes() {
     try {
         const fetchGlobal = fetch("https://7tv.io/v3/emote-sets/global");
-        const fetchEmoteSet = fetch(`https://7tv.io/v3/emote-sets/${import.meta.env.VITE_7TV_CHANNEL_ID}`);
+        const fetchEmoteSet = fetch(
+            `https://7tv.io/v3/emote-sets/${import.meta.env.VITE_7TV_CHANNEL_ID}`
+        );
 
-        const [globalResponse, setResponse] = await Promise.all([fetchGlobal, fetchEmoteSet]);
+        const [globalResponse, setResponse] = await Promise.all([
+            fetchGlobal,
+            fetchEmoteSet,
+        ]);
         const globalEmotes = await globalResponse.json();
         const setEmotes = await setResponse.json();
 
         const emotes = [...globalEmotes.emotes, ...setEmotes.emotes];
-        
+
         return emotes;
     } catch (error) {
         console.error(error);
     }
 }
-
 
 export function getChatSnapshot(
     callback: (snapshot: QuerySnapshot<Message>) => void
@@ -95,7 +100,7 @@ export function getChatSnapshot(
 }
 
 export function getUserData(uid: string) {
-    return getDoc(doc(db, 'users', uid));
+    return getDoc(doc(db, "users", uid));
 }
 
 export function fetchPreviousMessages(doc: DocumentData) {
@@ -114,23 +119,26 @@ export async function sendMessageToDb(data: Message) {
 }
 
 /**
- * 
- * @param file 
+ *
+ * @param file
  * @returns A string url for the uploaded image
  */
 export async function uploadFile(file: File) {
     const fd = new FormData();
     fd.append("image", file);
 
-    const data = await fetch("https://chatmmy-notifier.onrender.com/image-processing", {
-        "method": "POST",
-        body: fd
-    });
+    const data = await fetch(
+        "https://chatmmy-notifier.onrender.com/image-processing",
+        {
+            method: "POST",
+            body: fd,
+        }
+    );
 
-    const blob = await data.blob()
+    const blob = await data.blob();
 
     const now = new Date().getTime();
-    const name = `${now}-${file.name}`
+    const name = `${now}-${file.name}`;
     const imageRef = ref(storage, name);
     const snapshot = await uploadBytes(imageRef, blob);
     const url = await getDownloadURL(snapshot.ref);
@@ -141,7 +149,7 @@ export async function saveDeviceToken(token: string) {
     const user = auth.currentUser;
 
     if (!user) return;
-    
+
     const usersRef = collection(db, "users");
 
     try {
@@ -149,23 +157,27 @@ export async function saveDeviceToken(token: string) {
 
         if (snapshot.empty) throw new Error("No users found!");
 
-        const doc = snapshot.docs.find(doc => doc.id !== user.uid);
+        const doc = snapshot.docs.find((doc) => doc.id !== user.uid);
 
-        if (!doc) throw new Error("User document not found!")
-        
+        if (!doc) throw new Error("User document not found!");
+
         const ref = doc.ref;
         const data = doc.data();
         const tokens = [...data.tokens, token];
         const tokenSet = new Set(tokens);
         const filteredTokens = [...tokenSet];
         await updateDoc(ref, { tokens: filteredTokens });
-
     } catch (error) {
         console.error("Error updating user's name in Firestore:", error);
-    }   
+    }
 }
 
-export async function sendNotification(token: string, title: string, message: string, icon?: string | null) {
+export async function sendNotification(
+    token: string,
+    title: string,
+    message: string,
+    icon?: string | null
+) {
     return fetch("https://chatmmy-notifier.onrender.com/send-notification", {
         method: "POST",
         headers: {
@@ -202,7 +214,18 @@ export async function getChecklist(id: string) {
     return snapshot.data();
 }
 
-export async function saveChecklist(checklist: Checklist, id?: string): Promise<string> {
+export function getChecklistSnapshot(
+    id: string,
+    callback: (snapshot: DocumentSnapshot<Checklist>) => void
+) {
+    const docRef = doc(db, `checklists`, id).withConverter(checklistConverter);
+    return onSnapshot(docRef, callback);
+}
+
+export async function saveChecklist(
+    checklist: Checklist,
+    id?: string
+): Promise<string> {
     if (!id || id === "createForm") {
         const document = await addDoc(collection(db, "checklists"), checklist);
         return document.id;

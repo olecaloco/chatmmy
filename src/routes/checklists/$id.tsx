@@ -1,6 +1,6 @@
 import { ChecklistForm } from "@/components/checklists/ChecklistForm";
 import { Button } from "@/components/ui/button";
-import { deleteChecklist, getChecklist } from "@/lib/api";
+import { deleteChecklist, getChecklistSnapshot } from "@/lib/api";
 import { Checklist } from "@/models";
 import {
     createFileRoute,
@@ -36,9 +36,17 @@ function RouteComponent() {
     const [deleting, setDeleting] = useState<boolean>(false);
 
     useEffect(() => {
-        getChecklist(id).then((data) => {
+        const unsubscribe = getChecklistSnapshot(id, (snapshot) => {
+            if (!snapshot.exists()) {
+                setChecklist(undefined);
+                return;
+            }
+
+            const data = snapshot.data();
             setChecklist(data);
         });
+
+        return () => unsubscribe();
     }, [id]);
 
     const updateLoadingState = (newLoadingState: boolean) => {

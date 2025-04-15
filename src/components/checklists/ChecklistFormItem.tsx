@@ -22,7 +22,7 @@ export const ChecklistFormItem = ({
         <div className="flex items-center space-x-2 flex-1">
             <Checkbox
                 id={id}
-                defaultChecked={item.checked}
+                checked={item.checked}
                 tabIndex={-1}
                 onCheckedChange={(checked) =>
                     onCheckedChange(item.id, Boolean(checked))
