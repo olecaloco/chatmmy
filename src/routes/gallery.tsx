@@ -58,7 +58,7 @@ function RouteComponent() {
                             <img
                                 src={media.url}
                                 alt="Gallery Image"
-                                className="w-full h-[300px] object-cover object-center rounded-lg shadow-md"
+                                className="w-full h-[200px] lg:h-[300px] object-cover object-center rounded-lg shadow-md"
                             />
                             <span className="absolute bottom-1 right-1 p-1 text-xs bg-black/40 rounded">
                                 {format(media.createdAt, "MM/dd/yyyy")}
