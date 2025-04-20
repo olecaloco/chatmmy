@@ -41,3 +41,10 @@ export interface ChecklistItem {
     checked: boolean;
     content: string;
 }
+
+export interface Media {
+    id?: string;
+    url: string;
+    createdAt: Date;
+    createdBy: string;
+}

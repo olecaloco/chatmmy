@@ -1,5 +1,5 @@
 import { auth, db, storage } from "@/firebase";
-import { Checklist, Message } from "@/models";
+import { Checklist, Media, Message } from "@/models";
 import {
     addDoc,
     collection,
@@ -47,6 +47,20 @@ const checklistConverter: FirestoreDataConverter<Checklist> = {
             ...data,
             id: snapshot.id,
         } as Checklist;
+    },
+};
+
+const mediaConverter: FirestoreDataConverter<Media> = {
+    toFirestore: (media) => media,
+    fromFirestore: (snapshot: QueryDocumentSnapshot<Media>, options) => {
+        const data = snapshot.data(options);
+        const date = ((data.createdAt as unknown) as Timestamp).toDate();
+
+        return {
+            ...data,
+            id: snapshot.id,
+            createdAt: date
+        } as Media;
     },
 };
 
@@ -115,7 +129,31 @@ export function fetchPreviousMessages(doc: DocumentData) {
 }
 
 export async function sendMessageToDb(data: Message) {
+    if (data.media) {
+        data.media.forEach((url) => {
+            saveMedia(url, data.senderId);
+        });
+    }
+
     return addDoc(collection(db, "messages"), data);
+}
+
+export function fetchMedia(callback: (snapshot: QuerySnapshot<Media>) => void) {
+    const q = query(
+        collection(db, "media"),
+        orderBy("createdAt", "desc"),
+        limit(DOC_LIMIT)
+    ).withConverter(mediaConverter);
+
+    return onSnapshot(q, callback);
+}
+
+export async function saveMedia(mediaURL: string, createdBy: string) {
+    return addDoc(collection(db, "media"), {
+        url: mediaURL,
+        createdAt: new Date(),
+        createdBy,
+    });
 }
 
 /**

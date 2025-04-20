@@ -5,6 +5,7 @@ import {
     createRootRouteWithContext,
     Link,
     Outlet,
+    useLocation,
 } from "@tanstack/react-router";
 import Icon from "@/assets/icon.svg";
 import {
@@ -26,7 +27,7 @@ import {
     SheetHeader,
     SheetTitle,
 } from "@/components/ui/sheet";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface MyRouterContext {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -41,6 +42,11 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 function RootComponent() {
     const [open, setOpen] = useState(false);
     const { user } = useAuthContext();
+    const location = useLocation();
+
+    useEffect(() => {
+        setOpen(false);
+    }, [location]);
 
     const handleRequestNotification = () => {
         Notification.requestPermission();
@@ -59,8 +65,6 @@ function RootComponent() {
         });
     };
 
-    const onLinkClick = () => setOpen(false);
-
     return (
         <Sheet open={open} onOpenChange={setOpen}>
             <SheetContent className="w-[300px]" side="left">
@@ -69,9 +73,10 @@ function RootComponent() {
                     <SheetDescription>The best chat for Chammy and Olie</SheetDescription>
                 </SheetHeader>
                 <nav className="mt-5 flex flex-col gap-4">
-                    <Link onClick={onLinkClick} to="/">Chat</Link>
-                    <Link onClick={onLinkClick} to="/checklists" search={{ id: undefined }}>Checklists</Link>
-                    <Link onClick={onLinkClick} to="/focus">Focus</Link>
+                    <Link to="/">Chat</Link>
+                    <Link to="/gallery">Gallery</Link>
+                    <Link to="/checklists" search={{ id: undefined }}>Checklists</Link>
+                    <Link to="/focus">Focus</Link>
                 </nav>
             </SheetContent>
 
