@@ -47,7 +47,7 @@ function RouteComponent() {
                 Carousel: { infinite: false },
             }}
         >
-            <div className="grid grid-cols-3 lg:grid-cols-5 gap-1 p-4">
+            <div className="grid grid-cols-3 lg:grid-cols-5 gap-1 p-4 h-full overflow-y-auto">
                 {gallery.map((media) => (
                     <div key={media.id} className="relative">
                         <a
