@@ -12,8 +12,6 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as SigninImport } from './routes/signin'
-import { Route as GalleryImport } from './routes/gallery'
-import { Route as FocusImport } from './routes/focus'
 import { Route as AuthImport } from './routes/_auth'
 import { Route as IndexImport } from './routes/index'
 import { Route as ChecklistsIndexImport } from './routes/checklists/index'
@@ -25,18 +23,6 @@ import { Route as ChecklistsIdImport } from './routes/checklists/$id'
 const SigninRoute = SigninImport.update({
   id: '/signin',
   path: '/signin',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const GalleryRoute = GalleryImport.update({
-  id: '/gallery',
-  path: '/gallery',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const FocusRoute = FocusImport.update({
-  id: '/focus',
-  path: '/focus',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -87,20 +73,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthImport
       parentRoute: typeof rootRoute
     }
-    '/focus': {
-      id: '/focus'
-      path: '/focus'
-      fullPath: '/focus'
-      preLoaderRoute: typeof FocusImport
-      parentRoute: typeof rootRoute
-    }
-    '/gallery': {
-      id: '/gallery'
-      path: '/gallery'
-      fullPath: '/gallery'
-      preLoaderRoute: typeof GalleryImport
-      parentRoute: typeof rootRoute
-    }
     '/signin': {
       id: '/signin'
       path: '/signin'
@@ -137,8 +109,6 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '': typeof AuthRoute
-  '/focus': typeof FocusRoute
-  '/gallery': typeof GalleryRoute
   '/signin': typeof SigninRoute
   '/checklists/$id': typeof ChecklistsIdRoute
   '/checklists/create': typeof ChecklistsCreateRoute
@@ -148,8 +118,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '': typeof AuthRoute
-  '/focus': typeof FocusRoute
-  '/gallery': typeof GalleryRoute
   '/signin': typeof SigninRoute
   '/checklists/$id': typeof ChecklistsIdRoute
   '/checklists/create': typeof ChecklistsCreateRoute
@@ -160,8 +128,6 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/_auth': typeof AuthRoute
-  '/focus': typeof FocusRoute
-  '/gallery': typeof GalleryRoute
   '/signin': typeof SigninRoute
   '/checklists/$id': typeof ChecklistsIdRoute
   '/checklists/create': typeof ChecklistsCreateRoute
@@ -173,8 +139,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | ''
-    | '/focus'
-    | '/gallery'
     | '/signin'
     | '/checklists/$id'
     | '/checklists/create'
@@ -183,8 +147,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | ''
-    | '/focus'
-    | '/gallery'
     | '/signin'
     | '/checklists/$id'
     | '/checklists/create'
@@ -193,8 +155,6 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_auth'
-    | '/focus'
-    | '/gallery'
     | '/signin'
     | '/checklists/$id'
     | '/checklists/create'
@@ -205,8 +165,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
-  FocusRoute: typeof FocusRoute
-  GalleryRoute: typeof GalleryRoute
   SigninRoute: typeof SigninRoute
   ChecklistsIdRoute: typeof ChecklistsIdRoute
   ChecklistsCreateRoute: typeof ChecklistsCreateRoute
@@ -216,8 +174,6 @@ export interface RootRouteChildren {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
-  FocusRoute: FocusRoute,
-  GalleryRoute: GalleryRoute,
   SigninRoute: SigninRoute,
   ChecklistsIdRoute: ChecklistsIdRoute,
   ChecklistsCreateRoute: ChecklistsCreateRoute,
@@ -236,8 +192,6 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/_auth",
-        "/focus",
-        "/gallery",
         "/signin",
         "/checklists/$id",
         "/checklists/create",
@@ -249,12 +203,6 @@ export const routeTree = rootRoute
     },
     "/_auth": {
       "filePath": "_auth.tsx"
-    },
-    "/focus": {
-      "filePath": "focus.tsx"
-    },
-    "/gallery": {
-      "filePath": "gallery.tsx"
     },
     "/signin": {
       "filePath": "signin.tsx"

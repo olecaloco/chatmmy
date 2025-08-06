@@ -74,9 +74,7 @@ function RootComponent() {
                 </SheetHeader>
                 <nav className="mt-5 flex flex-col gap-4">
                     <Link to="/">Chat</Link>
-                    <Link to="/gallery">Gallery</Link>
                     <Link to="/checklists" search={{ id: undefined }}>Checklists</Link>
-                    <Link to="/focus">Focus</Link>
                 </nav>
             </SheetContent>
 
