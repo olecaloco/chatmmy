@@ -1,5 +1,5 @@
-import { auth, db, storage } from "@/firebase";
-import { Checklist, Media, Message } from "@/models";
+import { auth, db } from "@/firebase";
+import { Checklist, Message } from "@/models";
 import {
     addDoc,
     collection,
@@ -21,7 +21,6 @@ import {
     Timestamp,
     updateDoc,
 } from "firebase/firestore";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { DOC_LIMIT } from "./constants";
 
 const converter: FirestoreDataConverter<Message> = {
@@ -47,20 +46,6 @@ const checklistConverter: FirestoreDataConverter<Checklist> = {
             ...data,
             id: snapshot.id,
         } as Checklist;
-    },
-};
-
-const mediaConverter: FirestoreDataConverter<Media> = {
-    toFirestore: (media) => media,
-    fromFirestore: (snapshot: QueryDocumentSnapshot<Media>, options) => {
-        const data = snapshot.data(options);
-        const date = ((data.createdAt as unknown) as Timestamp).toDate();
-
-        return {
-            ...data,
-            id: snapshot.id,
-            createdAt: date
-        } as Media;
     },
 };
 
@@ -129,58 +114,7 @@ export function fetchPreviousMessages(doc: DocumentData) {
 }
 
 export async function sendMessageToDb(data: Message) {
-    if (data.media) {
-        data.media.forEach((url) => {
-            saveMedia(url, data.senderId);
-        });
-    }
-
     return addDoc(collection(db, "messages"), data);
-}
-
-export function fetchMedia(callback: (snapshot: QuerySnapshot<Media>) => void) {
-    const q = query(
-        collection(db, "media"),
-        orderBy("createdAt", "desc"),
-        limit(DOC_LIMIT)
-    ).withConverter(mediaConverter);
-
-    return onSnapshot(q, callback);
-}
-
-export async function saveMedia(mediaURL: string, createdBy: string) {
-    return addDoc(collection(db, "media"), {
-        url: mediaURL,
-        createdAt: new Date(),
-        createdBy,
-    });
-}
-
-/**
- *
- * @param file
- * @returns A string url for the uploaded image
- */
-export async function uploadFile(file: File) {
-    const fd = new FormData();
-    fd.append("image", file);
-
-    const data = await fetch(
-        "https://chatmmy-notifier.onrender.com/image-processing",
-        {
-            method: "POST",
-            body: fd,
-        }
-    );
-
-    const blob = await data.blob();
-
-    const now = new Date().getTime();
-    const name = `${now}-${file.name}`;
-    const imageRef = ref(storage, name);
-    const snapshot = await uploadBytes(imageRef, blob);
-    const url = await getDownloadURL(snapshot.ref);
-    return url;
 }
 
 export async function saveDeviceToken(token: string) {

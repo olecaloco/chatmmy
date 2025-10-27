@@ -52,9 +52,6 @@ export const processMessageData = (
       data.replyingTo = replyingTo.id;
       data.replyingToContent = replyingTo.content;
       data.replyingToEmoteUrls = replyingTo.emoteUrls;
-      if (replyingTo.media) {
-          data.replyingToMedia = replyingTo.media;
-      }
   }
 
   return data;

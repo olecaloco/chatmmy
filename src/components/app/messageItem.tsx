@@ -22,7 +22,7 @@ export const MessageItem = ({
     const userOwnsMessage = message.senderId === user?.uid;
     const isMessageLatest = messageIndex === 0;
 
-    const hasReplyContent = (message.replyingToContent || (message.replyingToMedia && message.replyingToMedia.length > 0)) ? true : false;
+    const hasReplyContent = message.replyingToContent ? true : false;
     const prevMessage = messages[messageIndex - 1];
     const isPrevAuthor = prevMessage?.senderId === message.senderId;
     let shouldShowTime = true;
@@ -30,7 +30,7 @@ export const MessageItem = ({
     if (
         isPrevAuthor &&
         formatTimestamp(message.createdAt) ==
-        formatTimestamp(prevMessage.createdAt)
+            formatTimestamp(prevMessage.createdAt)
     ) {
         shouldShowTime = false;
     }
@@ -79,21 +79,32 @@ export const MessageItem = ({
     );
 
     return (
-        <div className={cn("flex flex-col text-sm", { "items-end": userOwnsMessage, "items-start": !userOwnsMessage })}>
+        <div
+            className={cn("flex flex-col text-sm", {
+                "items-end": userOwnsMessage,
+                "items-start": !userOwnsMessage,
+            })}
+        >
             <animated.div
                 {...bind()}
                 style={{ ...style }}
-                className={
-                    cn("flex flex-col [overflow-wrap:anywhere] touch-none w-max max-w-[75%] will-change-transform", {
+                className={cn(
+                    "flex flex-col [overflow-wrap:anywhere] touch-none w-max max-w-[75%] will-change-transform",
+                    {
                         "items-end": userOwnsMessage,
-                        "items-start": !userOwnsMessage
-                    })
-                }
+                        "items-start": !userOwnsMessage,
+                    }
+                )}
             >
-                {hasReplyContent && <RepliedToBubble message={message} isMyMessage={userOwnsMessage} />}
+                {hasReplyContent && (
+                    <RepliedToBubble
+                        message={message}
+                        isMyMessage={userOwnsMessage}
+                    />
+                )}
                 <ChatBubble message={message} isMyMessage={userOwnsMessage} />
             </animated.div>
             {shouldShowTime && <ChatTimestamp createdAt={message.createdAt} />}
         </div>
-    )
+    );
 };
