@@ -14,20 +14,12 @@ export const ReplyingTo = ({
         <div className="overflow-hidden">
             <div className="flex items-center justify-between px-4 py-2 mt-2 bg-muted overflow-hidden">
                 <div className="flex gap-2 items-center flex-1 truncate">
-                    <span className="text-xs font-bold">
-                        Replying To:
-                    </span>
-                    {(replyingTo?.media &&
-                        replyingTo?.media.length > 0) && (
-                            <img
-                                className="w-12 h-12 object-cover"
-                                src={replyingTo.media[0]}
-                                alt=""
-                                loading="lazy"
-                            />
-                        )}
+                    <span className="text-xs font-bold">Replying To:</span>
                     <span className="text-sm">
-                        {normalizeMessage(replyingTo?.content ?? "", "replying")}
+                        {normalizeMessage(
+                            replyingTo?.content ?? "",
+                            "replying"
+                        )}
                     </span>
                 </div>
                 <Button
@@ -40,5 +32,5 @@ export const ReplyingTo = ({
                 </Button>
             </div>
         </div>
-    )
+    );
 };
