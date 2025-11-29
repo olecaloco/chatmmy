@@ -26,6 +26,8 @@ messaging.onBackgroundMessage((payload) => {
         body: payload.data.body,
         icon: payload.data.icon || "./pwa-192x192.png",
         data: { url: link },
+        tag: "chatmmy",
+        renotify: true
     };
     self.registration.showNotification(notificationTitle, notificationOptions);
 });

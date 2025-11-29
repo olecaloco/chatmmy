@@ -50,6 +50,12 @@ const checklistConverter: FirestoreDataConverter<Checklist> = {
 };
 
 export function createEmoteHashMap(emotes: any[]) {
+    const current = window.localStorage.getItem("emotesHashMap");
+
+    if (current !== undefined) {
+        window.localStorage.removeItem("emotesHashMap");
+    }
+
     const hashmap: { [key: string]: string } = {};
 
     for (let i = 0; i < emotes.length; i++) {
@@ -61,6 +67,7 @@ export function createEmoteHashMap(emotes: any[]) {
     }
 
     const hashmapString = JSON.stringify(hashmap);
+
     window.localStorage.setItem("emotesHashMap", hashmapString);
 }
 
