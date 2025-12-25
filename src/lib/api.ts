@@ -73,9 +73,11 @@ export function createEmoteHashMap(emotes: any[]) {
 
 export async function getEmotes() {
     try {
-        const fetchGlobal = fetch("https://7tv.io/v3/emote-sets/global");
+        const date = new Date();
+        const time = date.getTime();
+        const fetchGlobal = fetch(`https://7tv.io/v3/emote-sets/global?t=${time}`);
         const fetchEmoteSet = fetch(
-            `https://7tv.io/v3/emote-sets/${import.meta.env.VITE_7TV_CHANNEL_ID}`
+            `https://7tv.io/v3/emote-sets/${import.meta.env.VITE_7TV_CHANNEL_ID}?t=${time}`
         );
 
         const [globalResponse, setResponse] = await Promise.all([
