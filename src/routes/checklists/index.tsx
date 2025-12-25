@@ -57,7 +57,7 @@ function Checklists() {
     const hasChecklist = checklists.length > 0 ? true : false;
 
     return (
-        <div className="flex flex-col px-3 mt-4 gap-4">
+        <div className="flex flex-1 flex-col px-3 pb-4 mt-4 gap-4 overflow-y-hidden">
             <div className="flex items-center justify-between">
                 <h1 className="text-2xl">Checklists</h1>
                 <Button asChild>
@@ -68,7 +68,7 @@ function Checklists() {
             </div>
 
             {hasChecklist && (
-                <div className="flex-1 -mx-3 overflow-y-auto max-h-[calc(100%-370px)]">
+                <div className="flex-1 -mx-3 overflow-y-auto max-h-full">
                     <ul className="px-4 space-y-2">
                         {checklists.map((checklist) => (
                             <li
