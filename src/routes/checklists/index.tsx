@@ -5,11 +5,12 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { getChecklistsSnapshot, saveChecklist } from "@/lib/api";
+import { cn } from "@/lib/utils";
 import { Checklist } from "@/models";
 import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { format } from "date-fns";
-import { EllipsisIcon, PlusIcon } from "lucide-react";
+import { CircleCheck, EllipsisIcon, PlusIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export const Route = createFileRoute("/checklists/")({
@@ -56,6 +57,10 @@ function Checklists() {
 
     const hasChecklist = checklists.length > 0 ? true : false;
 
+    const isAllChecked = (checklist: Checklist): boolean => {
+        return checklist.items.every((item) => item.checked);
+    };
+
     return (
         <div className="flex flex-1 flex-col px-3 pb-4 mt-4 gap-4 overflow-y-hidden">
             <div className="flex items-center justify-between">
@@ -89,20 +94,30 @@ function Checklists() {
                                         </span>
                                     </Link>
                                 </div>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger>
-                                        <EllipsisIcon />
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent>
-                                        <DropdownMenuItem
-                                            onClick={() =>
-                                                handleDuping(checklist)
-                                            }
-                                        >
-                                            Duplicate
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                                <div className="flex items-center gap-1">
+                                    <CircleCheck
+                                        className={cn({
+                                            "text-white/10":
+                                                !isAllChecked(checklist),
+                                            "text-emerald-400":
+                                                isAllChecked(checklist),
+                                        })}
+                                    />
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger>
+                                            <EllipsisIcon />
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent>
+                                            <DropdownMenuItem
+                                                onClick={() =>
+                                                    handleDuping(checklist)
+                                                }
+                                            >
+                                                Duplicate
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </div>
                             </li>
                         ))}
                     </ul>
