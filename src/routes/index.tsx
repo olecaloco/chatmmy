@@ -118,14 +118,9 @@ function Index() {
 
                 const body = data.content.trim();
 
-                userData.tokens.forEach((token) => {
-                    sendNotification(
-                        token,
-                        "A New Message",
-                        body,
-                        user?.photoURL
-                    );
-                });
+                // Only use the last token
+                const token = userData.tokens[userData.tokens.length - 1];
+                sendNotification(token, "A New Message", body, user?.photoURL);
             })
             .catch((e) => console.error(e));
 
