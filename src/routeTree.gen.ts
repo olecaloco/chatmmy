@@ -8,99 +8,46 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-// Import Routes
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as SigninRouteImport } from './routes/signin'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as ChecklistsIndexRouteImport } from './routes/checklists/index'
+import { Route as ChecklistsCreateRouteImport } from './routes/checklists/create'
+import { Route as ChecklistsIdRouteImport } from './routes/checklists/$id'
 
-import { Route as rootRoute } from './routes/__root'
-import { Route as SigninImport } from './routes/signin'
-import { Route as IndexImport } from './routes/index'
-import { Route as ChecklistsIndexImport } from './routes/checklists/index'
-import { Route as ChecklistsCreateImport } from './routes/checklists/create'
-import { Route as ChecklistsIdImport } from './routes/checklists/$id'
-
-// Create/Update Routes
-
-const SigninRoute = SigninImport.update({
+const SigninRoute = SigninRouteImport.update({
   id: '/signin',
   path: '/signin',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const IndexRoute = IndexImport.update({
+const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const ChecklistsIndexRoute = ChecklistsIndexImport.update({
+const ChecklistsIndexRoute = ChecklistsIndexRouteImport.update({
   id: '/checklists/',
   path: '/checklists/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const ChecklistsCreateRoute = ChecklistsCreateImport.update({
+const ChecklistsCreateRoute = ChecklistsCreateRouteImport.update({
   id: '/checklists/create',
   path: '/checklists/create',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const ChecklistsIdRoute = ChecklistsIdImport.update({
+const ChecklistsIdRoute = ChecklistsIdRouteImport.update({
   id: '/checklists/$id',
   path: '/checklists/$id',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-// Populate the FileRoutesByPath interface
-
-declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/signin': {
-      id: '/signin'
-      path: '/signin'
-      fullPath: '/signin'
-      preLoaderRoute: typeof SigninImport
-      parentRoute: typeof rootRoute
-    }
-    '/checklists/$id': {
-      id: '/checklists/$id'
-      path: '/checklists/$id'
-      fullPath: '/checklists/$id'
-      preLoaderRoute: typeof ChecklistsIdImport
-      parentRoute: typeof rootRoute
-    }
-    '/checklists/create': {
-      id: '/checklists/create'
-      path: '/checklists/create'
-      fullPath: '/checklists/create'
-      preLoaderRoute: typeof ChecklistsCreateImport
-      parentRoute: typeof rootRoute
-    }
-    '/checklists/': {
-      id: '/checklists/'
-      path: '/checklists'
-      fullPath: '/checklists'
-      preLoaderRoute: typeof ChecklistsIndexImport
-      parentRoute: typeof rootRoute
-    }
-  }
-}
-
-// Create and export the route tree
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/signin': typeof SigninRoute
   '/checklists/$id': typeof ChecklistsIdRoute
   '/checklists/create': typeof ChecklistsCreateRoute
-  '/checklists': typeof ChecklistsIndexRoute
+  '/checklists/': typeof ChecklistsIndexRoute
 }
-
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/signin': typeof SigninRoute
@@ -108,16 +55,14 @@ export interface FileRoutesByTo {
   '/checklists/create': typeof ChecklistsCreateRoute
   '/checklists': typeof ChecklistsIndexRoute
 }
-
 export interface FileRoutesById {
-  __root__: typeof rootRoute
+  __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/signin': typeof SigninRoute
   '/checklists/$id': typeof ChecklistsIdRoute
   '/checklists/create': typeof ChecklistsCreateRoute
   '/checklists/': typeof ChecklistsIndexRoute
 }
-
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
@@ -125,7 +70,7 @@ export interface FileRouteTypes {
     | '/signin'
     | '/checklists/$id'
     | '/checklists/create'
-    | '/checklists'
+    | '/checklists/'
   fileRoutesByTo: FileRoutesByTo
   to: '/' | '/signin' | '/checklists/$id' | '/checklists/create' | '/checklists'
   id:
@@ -137,13 +82,52 @@ export interface FileRouteTypes {
     | '/checklists/'
   fileRoutesById: FileRoutesById
 }
-
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SigninRoute: typeof SigninRoute
   ChecklistsIdRoute: typeof ChecklistsIdRoute
   ChecklistsCreateRoute: typeof ChecklistsCreateRoute
   ChecklistsIndexRoute: typeof ChecklistsIndexRoute
+}
+
+declare module '@tanstack/react-router' {
+  interface FileRoutesByPath {
+    '/signin': {
+      id: '/signin'
+      path: '/signin'
+      fullPath: '/signin'
+      preLoaderRoute: typeof SigninRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checklists/': {
+      id: '/checklists/'
+      path: '/checklists'
+      fullPath: '/checklists/'
+      preLoaderRoute: typeof ChecklistsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checklists/create': {
+      id: '/checklists/create'
+      path: '/checklists/create'
+      fullPath: '/checklists/create'
+      preLoaderRoute: typeof ChecklistsCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checklists/$id': {
+      id: '/checklists/$id'
+      path: '/checklists/$id'
+      fullPath: '/checklists/$id'
+      preLoaderRoute: typeof ChecklistsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+  }
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -153,39 +137,6 @@ const rootRouteChildren: RootRouteChildren = {
   ChecklistsCreateRoute: ChecklistsCreateRoute,
   ChecklistsIndexRoute: ChecklistsIndexRoute,
 }
-
-export const routeTree = rootRoute
+export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-/* ROUTE_MANIFEST_START
-{
-  "routes": {
-    "__root__": {
-      "filePath": "__root.tsx",
-      "children": [
-        "/",
-        "/signin",
-        "/checklists/$id",
-        "/checklists/create",
-        "/checklists/"
-      ]
-    },
-    "/": {
-      "filePath": "index.tsx"
-    },
-    "/signin": {
-      "filePath": "signin.tsx"
-    },
-    "/checklists/$id": {
-      "filePath": "checklists/$id.tsx"
-    },
-    "/checklists/create": {
-      "filePath": "checklists/create.tsx"
-    },
-    "/checklists/": {
-      "filePath": "checklists/index.tsx"
-    }
-  }
-}
-ROUTE_MANIFEST_END */

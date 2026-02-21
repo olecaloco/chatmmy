@@ -28,7 +28,6 @@ import {
     SheetTitle,
 } from "@/components/ui/sheet";
 import { useEffect, useState } from "react";
-import { EmoteContextProvider } from "@/contexts/EmoteContextProvider";
 
 interface MyRouterContext {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -133,9 +132,7 @@ function RootComponent() {
                         )}
                     </div>
                 </div>
-                <EmoteContextProvider>
-                    <Outlet />
-                </EmoteContextProvider>
+                <Outlet />
             </div>
         </Sheet>
     );
