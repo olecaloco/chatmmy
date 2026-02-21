@@ -12,7 +12,6 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as SigninImport } from './routes/signin'
-import { Route as AuthImport } from './routes/_auth'
 import { Route as IndexImport } from './routes/index'
 import { Route as ChecklistsIndexImport } from './routes/checklists/index'
 import { Route as ChecklistsCreateImport } from './routes/checklists/create'
@@ -23,11 +22,6 @@ import { Route as ChecklistsIdImport } from './routes/checklists/$id'
 const SigninRoute = SigninImport.update({
   id: '/signin',
   path: '/signin',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const AuthRoute = AuthImport.update({
-  id: '/_auth',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -66,13 +60,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/_auth': {
-      id: '/_auth'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof AuthImport
-      parentRoute: typeof rootRoute
-    }
     '/signin': {
       id: '/signin'
       path: '/signin'
@@ -108,7 +95,6 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '': typeof AuthRoute
   '/signin': typeof SigninRoute
   '/checklists/$id': typeof ChecklistsIdRoute
   '/checklists/create': typeof ChecklistsCreateRoute
@@ -117,7 +103,6 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '': typeof AuthRoute
   '/signin': typeof SigninRoute
   '/checklists/$id': typeof ChecklistsIdRoute
   '/checklists/create': typeof ChecklistsCreateRoute
@@ -127,7 +112,6 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/_auth': typeof AuthRoute
   '/signin': typeof SigninRoute
   '/checklists/$id': typeof ChecklistsIdRoute
   '/checklists/create': typeof ChecklistsCreateRoute
@@ -138,23 +122,15 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | ''
     | '/signin'
     | '/checklists/$id'
     | '/checklists/create'
     | '/checklists'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | ''
-    | '/signin'
-    | '/checklists/$id'
-    | '/checklists/create'
-    | '/checklists'
+  to: '/' | '/signin' | '/checklists/$id' | '/checklists/create' | '/checklists'
   id:
     | '__root__'
     | '/'
-    | '/_auth'
     | '/signin'
     | '/checklists/$id'
     | '/checklists/create'
@@ -164,7 +140,6 @@ export interface FileRouteTypes {
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AuthRoute: typeof AuthRoute
   SigninRoute: typeof SigninRoute
   ChecklistsIdRoute: typeof ChecklistsIdRoute
   ChecklistsCreateRoute: typeof ChecklistsCreateRoute
@@ -173,7 +148,6 @@ export interface RootRouteChildren {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AuthRoute: AuthRoute,
   SigninRoute: SigninRoute,
   ChecklistsIdRoute: ChecklistsIdRoute,
   ChecklistsCreateRoute: ChecklistsCreateRoute,
@@ -191,7 +165,6 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/_auth",
         "/signin",
         "/checklists/$id",
         "/checklists/create",
@@ -200,9 +173,6 @@ export const routeTree = rootRoute
     },
     "/": {
       "filePath": "index.tsx"
-    },
-    "/_auth": {
-      "filePath": "_auth.tsx"
     },
     "/signin": {
       "filePath": "signin.tsx"
