@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
 import path from "path"
 import react from '@vitejs/plugin-react-swc'
-import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
+import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vitejs.dev/config/
@@ -10,7 +10,10 @@ export default defineConfig({
     host: '0.0.0.0'
   },
   plugins: [
-    TanStackRouterVite(),
+    tanstackRouter({
+      target: 'react',
+      autoCodeSplitting: true,
+    }),
     react(),
     VitePWA({
       registerType: 'prompt',

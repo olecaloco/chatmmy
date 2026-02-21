@@ -17,7 +17,7 @@ export const Suggestions = memo(
                 </small>
                 <ScrollArea
                     className={
-                        "[&>[data-radix-scroll-area-viewport]]:max-h-40 "
+                        "*:data-radix-scroll-area-viewport:max-h-40 "
                     }
                 >
                     {suggestions.map((s) => (

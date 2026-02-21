@@ -77,7 +77,7 @@ function Checklists() {
                     <ul className="px-4 space-y-2">
                         {checklists.map((checklist) => (
                             <li
-                                className="flex space-between items-center px-2 py-1 shadow bg-muted rounded"
+                                className="flex space-between items-center px-2 py-1 shadow-sm bg-muted rounded"
                                 key={checklist.id}
                             >
                                 <div className="flex-1">

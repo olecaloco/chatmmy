@@ -171,7 +171,7 @@ export const ChecklistForm = ({
     return (
         <form
             id={id}
-            className="flex flex-col min-h-[1px] flex-1 overflow-hidden"
+            className="flex flex-col min-h-px flex-1 overflow-hidden"
             onSubmit={onSubmit}
         >
             <div className="my-4">
