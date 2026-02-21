@@ -2,6 +2,7 @@ import { normalizeMessage } from "@/lib/normalizeMessage";
 import { X } from "lucide-react";
 import { Message } from "@/models";
 import { Button } from "../ui/button";
+import { useEmoteContext } from "@/contexts/EmoteContextProvider";
 
 export const ReplyingTo = ({
     replyingTo,
@@ -10,6 +11,8 @@ export const ReplyingTo = ({
     replyingTo: Message | null;
     setReplyingTo: any;
 }) => {
+    const emotes = useEmoteContext();
+
     return (
         <div className="overflow-hidden">
             <div className="flex items-center justify-between px-4 py-2 mt-2 bg-muted overflow-hidden">
@@ -18,7 +21,8 @@ export const ReplyingTo = ({
                     <span className="text-sm">
                         {normalizeMessage(
                             replyingTo?.content ?? "",
-                            "replying"
+                            "replying",
+                            emotes,
                         )}
                     </span>
                 </div>

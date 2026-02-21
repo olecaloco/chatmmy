@@ -3,13 +3,7 @@ import { Suggestions } from "@/components/app/suggestions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuthContext } from "@/helpers/authContext";
-import {
-    createEmoteHashMap,
-    getChatSnapshot,
-    getEmotes,
-    sendMessageToDb,
-    sendNotification,
-} from "@/lib/api";
+import { getChatSnapshot, sendMessageToDb, sendNotification } from "@/lib/api";
 import { Message } from "@/models";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { DocumentData } from "firebase/firestore";
@@ -19,6 +13,7 @@ import { useDebouncedCallback } from "use-debounce";
 import { ReplyingTo } from "@/components/app/replyingTo";
 import useFcmToken from "@/hooks/use-fcm-token";
 import { processMessageData } from "@/lib/utils";
+import { useEmoteContext } from "@/contexts/EmoteContextProvider";
 
 export const Route = createFileRoute("/")({
     beforeLoad: ({ context, location }) => {
@@ -36,13 +31,13 @@ export const Route = createFileRoute("/")({
 
 function Index() {
     const { notificationPermissionStatus } = useFcmToken();
+    const emotes = useEmoteContext();
 
     const { user, userData } = useAuthContext();
     const isFirstFetch = useRef(true);
 
     const firstMessageDocRef = useRef<DocumentData | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
-    const emotesRef = useRef<{ [key: string]: string }>({});
     const [messages, setMessages] = useState<Message[]>([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [incompleteEmote, setIncompleteEmote] = useState("");
@@ -51,10 +46,10 @@ function Index() {
     const navigate = useNavigate();
 
     const suggestions = useMemo(() => {
-        if (emotesRef.current) {
-            const keys = Object.keys(emotesRef.current);
+        if (emotes) {
+            const keys = Object.keys(emotes);
             const foundKeys = keys.filter((k) =>
-                k.toLowerCase().includes(incompleteEmote.toLowerCase())
+                k.toLowerCase().includes(incompleteEmote.toLowerCase()),
             );
             const sorted = [...foundKeys].sort((a, b) => {
                 const lowerA = a.toLowerCase();
@@ -63,29 +58,15 @@ function Index() {
                 if (lowerA > lowerB) return 1;
                 return 0;
             });
-            return sorted.map((f) => ({ name: f, url: emotesRef.current[f] }));
+            return sorted.map((f) => ({ name: f, url: emotes[f] }));
         } else {
             return [];
         }
-    }, [incompleteEmote]);
+    }, [incompleteEmote, emotes]);
 
     useEffect(() => {
         if (user === null) navigate({ to: "/signin" });
     }, [navigate, user]);
-
-    useEffect(() => {
-        const storedEmotesMap = window.localStorage.getItem("emotesHashMap");
-
-        if (!storedEmotesMap) {
-            getEmotes().then((emotes) => {
-                if (!emotes) return;
-                createEmoteHashMap(emotes);
-            });
-        } else {
-            const parsedEmotes = JSON.parse(storedEmotesMap);
-            emotesRef.current = parsedEmotes;
-        }
-    }, []);
 
     useEffect(() => {
         if (!user) return;
@@ -149,30 +130,29 @@ function Index() {
     };
 
     const onSuggestionClick = (emoteName: string) => {
-        if (inputRef.current) {
-            const currentText = inputRef.current.value;
-            const splittedText = currentText.split(" ");
-            splittedText[splittedText.length - 1] = emoteName;
+        const input = inputRef.current;
+        if (!input) return;
 
-            setShowSuggestions(false);
-            inputRef.current.value = splittedText.join(" ").trim();
-            inputRef.current.focus();
-        }
+        const words = input.value.split(" ");
+        words[words.length - 1] = emoteName;
+
+        input.value = words.join(" ");
+        input.focus();
+        setShowSuggestions(false);
     };
 
     const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
         const text = event.target.value;
-        const textParts = text.split(" ");
-        const lastPart = textParts[textParts.length - 1];
-        const isLastPartEmote = lastPart.startsWith(":");
-        const emoteFragment = lastPart.slice(1);
+        const words = text.split(" ");
+        const lastWord = words[words.length - 1];
 
-        if (isLastPartEmote && emoteFragment) {
+        if (lastWord.startsWith(":") && lastWord.length > 1) {
+            setIncompleteEmote(lastWord.slice(1));
             if (!showSuggestions) setShowSuggestions(true);
-            setIncompleteEmote(emoteFragment);
-        } else {
-            setShowSuggestions(false);
+            return;
         }
+
+        if (showSuggestions) setShowSuggestions(false);
     };
 
     const debounced = useDebouncedCallback(handleInput, 250);

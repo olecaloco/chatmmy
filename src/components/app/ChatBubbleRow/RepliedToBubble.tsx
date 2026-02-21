@@ -1,3 +1,4 @@
+import { useEmoteContext } from "@/contexts/EmoteContextProvider";
 import { normalizeMessage } from "@/lib/normalizeMessage";
 import { cn } from "@/lib/utils";
 import { Message } from "@/models";
@@ -10,6 +11,8 @@ interface Props {
 
 const RepliedToBubble = memo(
     ({ message, isMyMessage }: Props) => {
+        const emotes = useEmoteContext();
+
         return (
             <div
                 className={cn("p-2 mb-1 mt-4 rounded bg-muted opacity-80", {
@@ -18,7 +21,13 @@ const RepliedToBubble = memo(
                 })}
             >
                 <span className="block mb-2 text-xs">Replied To:</span>
-                <div>{normalizeMessage(message.replyingToContent!)}</div>
+                <div>
+                    {normalizeMessage(
+                        message.replyingToContent!,
+                        "not-replying",
+                        emotes,
+                    )}
+                </div>
             </div>
         );
     },
@@ -28,7 +37,7 @@ const RepliedToBubble = memo(
         }
 
         return true;
-    }
+    },
 );
 
 export default RepliedToBubble;

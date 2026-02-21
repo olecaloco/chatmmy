@@ -28,6 +28,7 @@ import {
     SheetTitle,
 } from "@/components/ui/sheet";
 import { useEffect, useState } from "react";
+import { EmoteContextProvider } from "@/contexts/EmoteContextProvider";
 
 interface MyRouterContext {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -70,18 +71,24 @@ function RootComponent() {
             <SheetContent className="w-[300px]" side="left">
                 <SheetHeader>
                     <SheetTitle>Chatmmy</SheetTitle>
-                    <SheetDescription>The best chat for Chammy and Olie</SheetDescription>
+                    <SheetDescription>
+                        The best chat for Chammy and Olie
+                    </SheetDescription>
                 </SheetHeader>
                 <nav className="mt-5 flex flex-col gap-4">
                     <Link to="/">Chat</Link>
-                    <Link to="/checklists" search={{ id: undefined }}>Checklists</Link>
+                    <Link to="/checklists" search={{ id: undefined }}>
+                        Checklists
+                    </Link>
                 </nav>
             </SheetContent>
 
             <div className="h-dvh flex flex-col">
                 <div className="p-4 flex items-center justify-between border-b">
-
-                    <span className="flex items-center gap-2 cursor-pointer" onClick={() => setOpen(true)}>
+                    <span
+                        className="flex items-center gap-2 cursor-pointer"
+                        onClick={() => setOpen(true)}
+                    >
                         <img
                             src={Icon}
                             alt="Chatmmy"
@@ -126,7 +133,9 @@ function RootComponent() {
                         )}
                     </div>
                 </div>
-                <Outlet />
+                <EmoteContextProvider>
+                    <Outlet />
+                </EmoteContextProvider>
             </div>
         </Sheet>
     );
