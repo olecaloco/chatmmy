@@ -20,3 +20,7 @@ A custom and basic PWA chat app with 7TV emotes. Made using Vite with PWA Asset 
 - Notification Support*
 
 * iOS unregisters token for notifications: https://github.com/firebase/firebase-js-sdk/issues/8010
+
+## Temp Fixes
+- Override version for minimatch due to vulnerability. Affected Packages: Any eslint package
+- eslint-plugin-react-hooks not having the correct eslint dependency to v10. Installed packages using --legacy-peer-deps
