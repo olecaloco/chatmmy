@@ -4,13 +4,16 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { getChecklistsSnapshot, saveChecklist } from "@/lib/api";
-import { cn } from "@/lib/utils";
+import {
+    deleteChecklist,
+    getChecklistsSnapshot,
+    saveChecklist,
+} from "@/lib/api";
 import { Checklist } from "@/models";
 import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { format } from "date-fns";
-import { CircleCheck, EllipsisIcon, PlusIcon } from "lucide-react";
+import { EllipsisIcon, PlusIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export const Route = createFileRoute("/checklists/")({
@@ -55,6 +58,18 @@ function Checklists() {
         saveChecklist(dupe);
     };
 
+    const handleDelete = async (checklist: Checklist) => {
+        if (!checklist.id) return;
+
+        const confirmation = window.confirm(
+            `Are you sure you want to delete the checklist "${checklist.title}"? This action cannot be undone.`,
+        );
+
+        if (!confirmation) return;
+
+        await deleteChecklist(checklist.id);
+    };
+
     const hasChecklist = checklists.length > 0 ? true : false;
 
     const isAllChecked = (checklist: Checklist): boolean => {
@@ -89,20 +104,28 @@ function Checklists() {
                                         <span className="block text-muted-foreground text-sm">
                                             {format(
                                                 checklist.createdAt,
-                                                "MMMM dd, yyyy"
+                                                "MMMM dd, yyyy",
                                             )}
                                         </span>
                                     </Link>
                                 </div>
                                 <div className="flex items-center gap-1">
-                                    <CircleCheck
-                                        className={cn({
-                                            "text-white/10":
-                                                !isAllChecked(checklist),
-                                            "text-emerald-400":
-                                                isAllChecked(checklist),
-                                        })}
-                                    />
+                                    {isAllChecked(checklist) && (
+                                        <img
+                                            loading="lazy"
+                                            src="https://cdn.7tv.app/emote/01GB4E5CB0000BJ5HR8F6XV9A0/1x.webp"
+                                            alt="Complete"
+                                            className="w-10"
+                                        />
+                                    )}
+                                    {!isAllChecked(checklist) && (
+                                        <img
+                                            loading="lazy"
+                                            src="https://cdn.7tv.app/emote/01H8K7GGEG00026Q8KSZWQ392W/1x.webp"
+                                            alt="Incomplete"
+                                            className="w-10"
+                                        />
+                                    )}
                                     <DropdownMenu>
                                         <DropdownMenuTrigger>
                                             <EllipsisIcon />
@@ -114,6 +137,14 @@ function Checklists() {
                                                 }
                                             >
                                                 Duplicate
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                className="text-red-500"
+                                                onClick={() =>
+                                                    handleDelete(checklist)
+                                                }
+                                            >
+                                                Delete
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
