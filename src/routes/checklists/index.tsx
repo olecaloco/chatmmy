@@ -1,3 +1,4 @@
+import { ChecklistListItem } from "@/components/checklists/ListItem";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenuContent,
@@ -7,6 +8,7 @@ import {
 import {
     deleteChecklist,
     getChecklistsSnapshot,
+    getPinnedChecklists,
     saveChecklist,
 } from "@/lib/api";
 import { Checklist } from "@/models";
@@ -32,6 +34,7 @@ export const Route = createFileRoute("/checklists/")({
 
 function Checklists() {
     const [checklists, setChecklist] = useState<Checklist[]>([]);
+    const [pinnedChecklists, setPinnedChecklists] = useState<Checklist[]>([]);
 
     useEffect(() => {
         const unsubscribe = getChecklistsSnapshot((snapshot) => {
@@ -40,12 +43,40 @@ function Checklists() {
                 return;
             }
 
-            const data = snapshot.docs.map((d) => d.data());
+            const data = snapshot.docs
+                .map((d) => d.data())
+                .filter((checklist) => !checklist.pinned);
+
             setChecklist(data);
         });
 
         return () => unsubscribe();
     }, []);
+
+    useEffect(() => {
+        const unsubscribe = getPinnedChecklists((snapshot) => {
+            if (snapshot.empty) {
+                setPinnedChecklists([]);
+                return;
+            }
+
+            const data = snapshot.docs.map((d) => d.data());
+            setPinnedChecklists(data);
+        });
+
+        return () => unsubscribe();
+    }, []);
+
+    const togglePin = async (checklist: Checklist) => {
+        if (!checklist.id) return;
+
+        const updatedChecklist = {
+            ...checklist,
+            pinned: !checklist.pinned,
+        };
+
+        await saveChecklist(updatedChecklist, checklist.id);
+    };
 
     const handleDuping = async (checklist: Checklist) => {
         const dupe = {
@@ -70,11 +101,8 @@ function Checklists() {
         await deleteChecklist(checklist.id);
     };
 
-    const hasChecklist = checklists.length > 0 ? true : false;
-
-    const isAllChecked = (checklist: Checklist): boolean => {
-        return checklist.items.every((item) => item.checked);
-    };
+    const hasPinnedChecklists = pinnedChecklists.length > 0 ? true : false;
+    const hasChecklists = checklists.length > 0 ? true : false;
 
     return (
         <div className="flex flex-1 flex-col px-3 pb-4 mt-4 gap-4 overflow-y-hidden">
@@ -87,71 +115,39 @@ function Checklists() {
                 </Button>
             </div>
 
-            {hasChecklist && (
+            {hasChecklists && (
                 <div className="flex-1 -mx-3 overflow-y-auto max-h-full">
-                    <ul className="px-4 space-y-2">
-                        {checklists.map((checklist) => (
-                            <li
-                                className="flex space-between items-center px-2 py-1 shadow-sm bg-muted rounded"
-                                key={checklist.id}
-                            >
-                                <div className="flex-1">
-                                    <Link
-                                        to="/checklists/$id"
-                                        params={{ id: checklist.id! }}
-                                    >
-                                        <h4>{checklist.title}</h4>
-                                        <span className="block text-muted-foreground text-sm">
-                                            {format(
-                                                checklist.createdAt,
-                                                "MMMM dd, yyyy",
-                                            )}
-                                        </span>
-                                    </Link>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                    {isAllChecked(checklist) && (
-                                        <img
-                                            loading="lazy"
-                                            src="https://cdn.7tv.app/emote/01GB4E5CB0000BJ5HR8F6XV9A0/1x.webp"
-                                            alt="Complete"
-                                            className="w-10"
-                                        />
-                                    )}
-                                    {!isAllChecked(checklist) && (
-                                        <img
-                                            loading="lazy"
-                                            src="https://cdn.7tv.app/emote/01H6SKVTWR00049XSVR28FKPP6/1x.webp"
-                                            alt="Incomplete"
-                                            className="w-10"
-                                        />
-                                    )}
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger>
-                                            <EllipsisIcon />
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent>
-                                            <DropdownMenuItem
-                                                onClick={() =>
-                                                    handleDuping(checklist)
-                                                }
-                                            >
-                                                Duplicate
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem
-                                                className="text-red-500"
-                                                onClick={() =>
-                                                    handleDelete(checklist)
-                                                }
-                                            >
-                                                Delete
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
+                    {hasPinnedChecklists && (
+                        <div className="px-4 mb-4">
+                            <div className="text-white/50 mb-1">Pinned</div>
+                            <ul className="space-y-2">
+                                {pinnedChecklists.map((checklist) => (
+                                    <ChecklistListItem
+                                        key={checklist.id}
+                                        checklist={checklist}
+                                        togglePin={togglePin}
+                                        handleDuping={handleDuping}
+                                        handleDelete={handleDelete}
+                                    />
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+
+                    <div className="px-4 mb-4">
+                        <div className="text-white/50 mb-1">Items</div>
+                        <ul className="space-y-2">
+                            {checklists.map((checklist) => (
+                                <ChecklistListItem
+                                    key={checklist.id}
+                                    checklist={checklist}
+                                    togglePin={togglePin}
+                                    handleDuping={handleDuping}
+                                    handleDelete={handleDelete}
+                                />
+                            ))}
+                        </ul>
+                    </div>
                 </div>
             )}
         </div>

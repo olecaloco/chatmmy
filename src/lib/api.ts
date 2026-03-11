@@ -20,6 +20,7 @@ import {
     startAfter,
     Timestamp,
     updateDoc,
+    where,
 } from "firebase/firestore";
 import { DOC_LIMIT } from "./constants";
 
@@ -179,6 +180,19 @@ export function getChecklistsSnapshot(
 ) {
     const q = query(
         collection(db, "checklists"),
+        orderBy("createdAt", "desc"),
+        limit(DOC_LIMIT)
+    ).withConverter(checklistConverter);
+
+    return onSnapshot(q, callback);
+}
+
+export function getPinnedChecklists(
+    callback: (snapshot: QuerySnapshot<Checklist>) => void
+) {
+    const q = query(
+        collection(db, "checklists"),
+        where("pinned", "==", true),
         orderBy("createdAt", "desc"),
         limit(DOC_LIMIT)
     ).withConverter(checklistConverter);

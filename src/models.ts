@@ -34,6 +34,7 @@ export interface Checklist {
     items: ChecklistItem[];
     createdAt: number;
     createdBy: string;
+    pinned?: boolean;
 }
 
 export interface ChecklistItem {
