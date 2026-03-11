@@ -1,21 +1,14 @@
 import { ChecklistListItem } from "@/components/checklists/ListItem";
 import { Button } from "@/components/ui/button";
 import {
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
     deleteChecklist,
     getChecklistsSnapshot,
     getPinnedChecklists,
     saveChecklist,
 } from "@/lib/api";
 import { Checklist } from "@/models";
-import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
-import { format } from "date-fns";
-import { EllipsisIcon, PlusIcon } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export const Route = createFileRoute("/checklists/")({
