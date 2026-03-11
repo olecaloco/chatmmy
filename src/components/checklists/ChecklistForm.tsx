@@ -38,7 +38,7 @@ export const ChecklistForm = ({
     }, [checklist]);
 
     const onSubmit = async (
-        event: FormEvent<HTMLFormElement>
+        event: FormEvent<HTMLFormElement>,
     ): Promise<void> => {
         event.preventDefault();
 
@@ -51,7 +51,7 @@ export const ChecklistForm = ({
         const data: Omit<Checklist, "id"> = {
             title: title,
             items: items,
-            createdAt: new Date().getTime(),
+            createdAt: checklist?.createdAt ?? new Date().getTime(),
             createdBy: user?.uid ?? "",
         };
 

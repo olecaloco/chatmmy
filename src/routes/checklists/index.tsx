@@ -121,7 +121,7 @@ function Checklists() {
                                     {!isAllChecked(checklist) && (
                                         <img
                                             loading="lazy"
-                                            src="https://cdn.7tv.app/emote/01H8K7GGEG00026Q8KSZWQ392W/1x.webp"
+                                            src="https://cdn.7tv.app/emote/01H6SKVTWR00049XSVR28FKPP6/1x.webp"
                                             alt="Incomplete"
                                             className="w-10"
                                         />
