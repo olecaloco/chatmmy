@@ -42,6 +42,11 @@ export function normalizeMessage(
                         alt={word}
                         className={cn("inline-block mx-1 select-none", {
                             "h-6": reply === "replying",
+                            "max-w-full": allEmotes,
+                            "h-auto": allEmotes,
+                            "flex-grow-1": allEmotes,
+                            "flex-shrink-1": allEmotes,
+                            "min-w-0": allEmotes,
                         })}
                         draggable="false"
                         title={word}

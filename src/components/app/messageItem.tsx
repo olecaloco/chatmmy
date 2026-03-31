@@ -75,7 +75,7 @@ export const MessageItem = ({
             },
             filterTaps: true,
             rubberband: true,
-        }
+        },
     );
 
     return (
@@ -89,11 +89,11 @@ export const MessageItem = ({
                 {...bind()}
                 style={{ ...style }}
                 className={cn(
-                    "flex flex-col wrap-anywhere touch-none w-max max-w-[75%] will-change-transform",
+                    "flex flex-col wrap-anywhere touch-none w-full max-w-[75%] will-change-transform",
                     {
                         "items-end": userOwnsMessage,
                         "items-start": !userOwnsMessage,
-                    }
+                    },
                 )}
             >
                 {hasReplyContent && (

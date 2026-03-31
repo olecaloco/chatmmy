@@ -32,6 +32,7 @@ const ChatBubbleTextOnly = ({ message, isMyMessage }: Props) => {
     return (
         <div
             className={cn("p-2 rounded", {
+                flex: allEmotes,
                 "bg-primary text-primary-foreground": isMyMessage && !emoteOnly,
                 "bg-muted": !isMyMessage && !emoteOnly,
             })}

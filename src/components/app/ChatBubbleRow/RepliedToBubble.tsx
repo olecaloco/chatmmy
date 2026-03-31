@@ -13,6 +13,13 @@ const RepliedToBubble = memo(
     ({ message, isMyMessage }: Props) => {
         const emotes = useEmoteContext();
 
+        const fragments = message.replyingToContent!.split(" ");
+        const allEmotes = fragments.every((fragment) => {
+            const emote = emotes[fragment];
+            if (emote) return true;
+            else return false;
+        });
+
         return (
             <div
                 className={cn("p-2 mb-1 mt-4 rounded bg-muted opacity-80", {
@@ -21,7 +28,11 @@ const RepliedToBubble = memo(
                 })}
             >
                 <span className="block mb-2 text-xs">Replied To:</span>
-                <div>
+                <div
+                    className={cn({
+                        flex: allEmotes,
+                    })}
+                >
                     {normalizeMessage(
                         message.replyingToContent!,
                         "not-replying",
