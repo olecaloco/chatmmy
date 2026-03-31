@@ -30,7 +30,7 @@ export function normalizeMessage(
             if (emote) {
                 const fileName =
                     (contentParts.length === 1 && reply !== "replying") ||
-                    allEmotes
+                    (allEmotes && reply !== "replying")
                         ? "2x.webp"
                         : "1x.webp";
                 const fullPath = `${emote}/${fileName}`;
