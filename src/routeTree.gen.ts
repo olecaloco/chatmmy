@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SigninRouteImport } from './routes/signin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ChecklistsIndexRouteImport } from './routes/checklists/index'
+import { Route as BrushIndexRouteImport } from './routes/brush/index'
 import { Route as ChecklistsCreateRouteImport } from './routes/checklists/create'
 import { Route as ChecklistsIdRouteImport } from './routes/checklists/$id'
 
@@ -30,6 +31,11 @@ const ChecklistsIndexRoute = ChecklistsIndexRouteImport.update({
   path: '/checklists/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BrushIndexRoute = BrushIndexRouteImport.update({
+  id: '/brush/',
+  path: '/brush/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ChecklistsCreateRoute = ChecklistsCreateRouteImport.update({
   id: '/checklists/create',
   path: '/checklists/create',
@@ -46,6 +52,7 @@ export interface FileRoutesByFullPath {
   '/signin': typeof SigninRoute
   '/checklists/$id': typeof ChecklistsIdRoute
   '/checklists/create': typeof ChecklistsCreateRoute
+  '/brush/': typeof BrushIndexRoute
   '/checklists/': typeof ChecklistsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -53,6 +60,7 @@ export interface FileRoutesByTo {
   '/signin': typeof SigninRoute
   '/checklists/$id': typeof ChecklistsIdRoute
   '/checklists/create': typeof ChecklistsCreateRoute
+  '/brush': typeof BrushIndexRoute
   '/checklists': typeof ChecklistsIndexRoute
 }
 export interface FileRoutesById {
@@ -61,6 +69,7 @@ export interface FileRoutesById {
   '/signin': typeof SigninRoute
   '/checklists/$id': typeof ChecklistsIdRoute
   '/checklists/create': typeof ChecklistsCreateRoute
+  '/brush/': typeof BrushIndexRoute
   '/checklists/': typeof ChecklistsIndexRoute
 }
 export interface FileRouteTypes {
@@ -70,15 +79,23 @@ export interface FileRouteTypes {
     | '/signin'
     | '/checklists/$id'
     | '/checklists/create'
+    | '/brush/'
     | '/checklists/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/signin' | '/checklists/$id' | '/checklists/create' | '/checklists'
+  to:
+    | '/'
+    | '/signin'
+    | '/checklists/$id'
+    | '/checklists/create'
+    | '/brush'
+    | '/checklists'
   id:
     | '__root__'
     | '/'
     | '/signin'
     | '/checklists/$id'
     | '/checklists/create'
+    | '/brush/'
     | '/checklists/'
   fileRoutesById: FileRoutesById
 }
@@ -87,6 +104,7 @@ export interface RootRouteChildren {
   SigninRoute: typeof SigninRoute
   ChecklistsIdRoute: typeof ChecklistsIdRoute
   ChecklistsCreateRoute: typeof ChecklistsCreateRoute
+  BrushIndexRoute: typeof BrushIndexRoute
   ChecklistsIndexRoute: typeof ChecklistsIndexRoute
 }
 
@@ -113,6 +131,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChecklistsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/brush/': {
+      id: '/brush/'
+      path: '/brush'
+      fullPath: '/brush/'
+      preLoaderRoute: typeof BrushIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/checklists/create': {
       id: '/checklists/create'
       path: '/checklists/create'
@@ -135,6 +160,7 @@ const rootRouteChildren: RootRouteChildren = {
   SigninRoute: SigninRoute,
   ChecklistsIdRoute: ChecklistsIdRoute,
   ChecklistsCreateRoute: ChecklistsCreateRoute,
+  BrushIndexRoute: BrushIndexRoute,
   ChecklistsIndexRoute: ChecklistsIndexRoute,
 }
 export const routeTree = rootRouteImport

@@ -63,10 +63,59 @@ function RootComponent() {
                 </span>
 
                 <nav className="flex items-center gap-2 bg-white/10 px-3 py-1 rounded">
-                    <Link activeOptions={{ exact: true }} to="/">
-                        Chat
+                    <Link activeOptions={{ exact: true }} to="/" title="Chat">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            className="lucide lucide-message-circle-icon lucide-message-circle"
+                        >
+                            <path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719" />
+                        </svg>
                     </Link>
-                    <Link to="/checklists">Checklists</Link>
+                    <Link to="/checklists" title="Checklist">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            className="lucide lucide-list-check-icon lucide-list-check"
+                        >
+                            <path d="M16 5H3" />
+                            <path d="M16 12H3" />
+                            <path d="M11 19H3" />
+                            <path d="m15 18 2 2 4-4" />
+                        </svg>
+                    </Link>
+                    <Link to="/brush" title="Brush">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            className="lucide lucide-brush-icon lucide-brush"
+                        >
+                            <path d="m11 10 3 3" />
+                            <path d="M6.5 21A3.5 3.5 0 1 0 3 17.5a2.62 2.62 0 0 1-.708 1.792A1 1 0 0 0 3 21z" />
+                            <path d="M9.969 17.031 21.378 5.624a1 1 0 0 0-3.002-3.002L6.967 14.031" />
+                        </svg>
+                    </Link>
                 </nav>
 
                 <div className="flex items-center gap-2">
