@@ -14,8 +14,8 @@ const router = createRouter({
     routeTree,
     defaultPreload: "intent",
     context: {
-        user: undefined,
-        userData: undefined,
+        user: null,
+        userData: null,
     },
 });
 
@@ -27,8 +27,8 @@ declare module "@tanstack/react-router" {
 }
 
 function InnerApp() {
-    const user = useAuthContext();
-    return <RouterProvider router={router} context={{ user }} />;
+    const { user, userData } = useAuthContext();
+    return <RouterProvider router={router} context={{ user, userData }} />;
 }
 
 // Render the app

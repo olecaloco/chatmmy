@@ -58,9 +58,9 @@ export const MessageItem = ({
             else _x = down ? (mx > 0 ? mx : 0) : 0;
             api.start({ x: _x, immediate: down });
 
-            if (userOwnsMessage && !active && memo.ox < -10 && onReply) {
+            if (userOwnsMessage && !active && memo.ox < -20 && onReply) {
                 onReply(message);
-            } else if (!userOwnsMessage && !active && memo.ox > 10 && onReply) {
+            } else if (!userOwnsMessage && !active && memo.ox > 20 && onReply) {
                 onReply(message);
             }
 
@@ -89,7 +89,7 @@ export const MessageItem = ({
                 {...bind()}
                 style={{ ...style }}
                 className={cn(
-                    "flex flex-col wrap-anywhere touch-none w-full max-w-[75%] will-change-transform",
+                    "flex flex-col wrap-anywhere touch-pan-y w-full max-w-[75%] will-change-transform",
                     {
                         "items-end": userOwnsMessage,
                         "items-start": !userOwnsMessage,

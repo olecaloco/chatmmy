@@ -1,6 +1,6 @@
 import { ModeToggle } from "@/components/mode-toggle";
 import { signOut } from "@/helpers/auth";
-import { useAuthContext } from "@/helpers/authContext";
+import { useAuthContext, UserData } from "@/helpers/authContext";
 import {
     createRootRouteWithContext,
     Link,
@@ -21,9 +21,8 @@ import { User } from "firebase/auth";
 import { createEmoteHashMap, getEmotes } from "@/lib/api";
 
 interface MyRouterContext {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    user: any; //Make this any kind of user type
-    userData: any;
+    user: User | null;
+    userData: UserData | null;
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
@@ -71,9 +70,9 @@ function RootComponent() {
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                             className="lucide lucide-message-circle-icon lucide-message-circle"
                         >
                             <path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719" />
@@ -87,9 +86,9 @@ function RootComponent() {
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                             className="lucide lucide-list-check-icon lucide-list-check"
                         >
                             <path d="M16 5H3" />
@@ -106,9 +105,9 @@ function RootComponent() {
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                             className="lucide lucide-brush-icon lucide-brush"
                         >
                             <path d="m11 10 3 3" />

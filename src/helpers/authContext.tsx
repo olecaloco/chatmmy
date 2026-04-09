@@ -5,26 +5,26 @@ import { User as FirebaseUser } from "firebase/auth";
 import Icon from "@/assets/icon.svg";
 import { doc, onSnapshot } from "firebase/firestore";
 
-type UserData = {
+export type UserData = {
     id: string;
-    tokens: string[]
-}
+    tokens: string[];
+};
 
-interface User {
+export interface ChatmmyUser {
     user: FirebaseUser | null;
     userData: UserData | null;
 }
 
-const userObj: User = { user: null, userData: null };
+const userObj: ChatmmyUser = { user: null, userData: null };
 export const AuthContext = createContext(userObj);
 
-export const useAuthContext = () => useContext<User>(AuthContext);
+export const useAuthContext = () => useContext<ChatmmyUser>(AuthContext);
 
 const Loader = () => (
     <div className="h-dvh flex items-center justify-center flex-1">
         <img className="w-24" src={Icon} alt="Chatmmy" loading="lazy" />
     </div>
-)
+);
 
 export const AuthContextProvider = ({ children }: any) => {
     const [user, setUser] = useState<FirebaseUser | null>(null);
@@ -43,15 +43,18 @@ export const AuthContextProvider = ({ children }: any) => {
     useEffect(() => {
         if (!user) return;
 
-        const unsubscribe = onSnapshot(doc(db, "users", user.uid), snapshot => {
-            const data = snapshot.data();
-            if (!snapshot.exists() || !data) return;
+        const unsubscribe = onSnapshot(
+            doc(db, "users", user.uid),
+            (snapshot) => {
+                const data = snapshot.data();
+                if (!snapshot.exists() || !data) return;
 
-            setData({ id: data.id, tokens: data.tokens })
-        });
+                setData({ id: data.id, tokens: data.tokens });
+            },
+        );
 
         return () => unsubscribe();
-    }, [user])
+    }, [user]);
 
     return (
         <AuthContext.Provider value={{ user, userData }}>

@@ -17,7 +17,7 @@ import { useEmoteContext } from "@/contexts/EmoteContextProvider";
 
 export const Route = createFileRoute("/")({
     beforeLoad: ({ context, location }) => {
-        if (!context.user.user) {
+        if (!context.user) {
             throw redirect({
                 to: "/signin",
                 search: {
@@ -117,7 +117,7 @@ function Index() {
         }
     };
 
-    const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const onSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
         event.preventDefault();
 
         setShowSuggestions(false);

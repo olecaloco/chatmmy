@@ -1,12 +1,13 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
     onAuthStateChanged as _onAuthStateChanged,
+    NextOrObserver,
     signInWithEmailAndPassword,
+    User,
 } from "firebase/auth";
 
 import { auth } from "@/firebase";
 
-export function onAuthStateChanged(cb: any) {
+export function onAuthStateChanged(cb: NextOrObserver<User>) {
     return _onAuthStateChanged(auth, cb);
 }
 

@@ -6,7 +6,7 @@ import { useState } from "react";
 
 export const Route = createFileRoute("/checklists/create")({
     beforeLoad: ({ context, location }) => {
-        if (!context.user.user) {
+        if (!context.user) {
             throw redirect({
                 to: "/signin",
                 search: {

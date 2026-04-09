@@ -1,14 +1,14 @@
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { signInWithEmailPassword } from '@/helpers/auth'
-import { useAuthContext } from '@/helpers/authContext';
-import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
-import { Eye, EyeOff } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { signInWithEmailPassword } from "@/helpers/auth";
+import { useAuthContext } from "@/helpers/authContext";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { Eye, EyeOff } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
-export const Route = createFileRoute('/signin')({
+export const Route = createFileRoute("/signin")({
     beforeLoad: ({ context, location }) => {
-        if (context.user.user) {
+        if (context.user) {
             throw redirect({
                 to: "/",
                 search: {
@@ -17,8 +17,8 @@ export const Route = createFileRoute('/signin')({
             });
         }
     },
-    component: SignIn
-})
+    component: SignIn,
+});
 
 function SignIn() {
     const navigate = useNavigate();
@@ -44,12 +44,11 @@ function SignIn() {
         } catch (e) {
             setLoading(false);
         }
-        
-    }
+    };
 
     const handleTogglePasswordVisibility = () => {
-        setShowPassword(p => !p);
-    }
+        setShowPassword((p) => !p);
+    };
 
     useEffect(() => {
         if (user !== null) navigate({ to: "/" });
@@ -59,17 +58,40 @@ function SignIn() {
         <div className="flex flex-col space-y-5 items-center justify-center flex-1">
             <form className="w-96 max-w-full px-2" onSubmit={handleSubmit}>
                 <div className="mb-2">
-                    <Input ref={emailInputRef} placeholder="Email" type="email" required />
+                    <Input
+                        ref={emailInputRef}
+                        placeholder="Email"
+                        type="email"
+                        required
+                    />
                 </div>
                 <div className="relative mb-2">
-                    <Input className="pr-10" ref={passwordInputRef} placeholder="Password" type={showPassword ? "text" : "password"} required />
-                    <Button className="absolute top-0 right-0 z-10 rounded-full" variant="ghost" size="icon" type="button" onClick={handleTogglePasswordVisibility}>
+                    <Input
+                        className="pr-10"
+                        ref={passwordInputRef}
+                        placeholder="Password"
+                        type={showPassword ? "text" : "password"}
+                        required
+                    />
+                    <Button
+                        className="absolute top-0 right-0 z-10 rounded-full"
+                        variant="ghost"
+                        size="icon"
+                        type="button"
+                        onClick={handleTogglePasswordVisibility}
+                    >
                         {!showPassword && <Eye className="w-4 h-4" />}
                         {showPassword && <EyeOff className="w-4 h-4" />}
                     </Button>
                 </div>
-                <Button className="block w-full" disabled={loading} type="submit">Login</Button>
+                <Button
+                    className="block w-full"
+                    disabled={loading}
+                    type="submit"
+                >
+                    Login
+                </Button>
             </form>
         </div>
-    )
+    );
 }

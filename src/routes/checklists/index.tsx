@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 
 export const Route = createFileRoute("/checklists/")({
     beforeLoad: ({ context, location }) => {
-        if (!context.user.user) {
+        if (!context.user) {
             throw redirect({
                 to: "/signin",
                 search: {

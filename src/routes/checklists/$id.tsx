@@ -14,7 +14,7 @@ import { useEffect, useState } from "react";
 
 export const Route = createFileRoute("/checklists/$id")({
     beforeLoad: ({ context, location }) => {
-        if (!context.user.user) {
+        if (!context.user) {
             throw redirect({
                 to: "/signin",
                 search: {
@@ -30,7 +30,7 @@ function RouteComponent() {
     const navigate = useNavigate();
     const { id } = useParams({ from: "/checklists/$id" });
     const [checklist, setChecklist] = useState<Checklist | undefined>(
-        undefined
+        undefined,
     );
     const [loading, setLoading] = useState<boolean>(false);
     const [deleting, setDeleting] = useState<boolean>(false);
@@ -58,7 +58,7 @@ function RouteComponent() {
         if (!checklist) return;
 
         const conf = confirm(
-            `Are you sure you want to delete ${checklist.title}`
+            `Are you sure you want to delete ${checklist.title}`,
         );
 
         if (!conf) return;
