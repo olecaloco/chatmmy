@@ -1,20 +1,24 @@
-import { KeyboardEvent, useId } from "react";
+import { ChangeEvent, KeyboardEvent, useId } from "react";
 import { ChecklistItem } from "@/models";
 import { Checkbox } from "../ui/checkbox";
 import { Input } from "../ui/input";
 
 interface Props {
     item: ChecklistItem;
+    index: number;
+    setInputRef: any;
     onKeyDown: (event: KeyboardEvent<HTMLInputElement>, id: number) => void;
-    onTextChange: (id: number, value: string) => void;
+    onTextChange: (id: number, event: ChangeEvent<HTMLInputElement>) => void;
     onCheckedChange: (id: number, checked: boolean) => void;
 }
 
 export const ChecklistFormItem = ({
     item,
+    index,
+    setInputRef,
     onCheckedChange,
     onTextChange,
-    onKeyDown
+    onKeyDown,
 }: Props) => {
     const id = useId();
 
@@ -29,11 +33,13 @@ export const ChecklistFormItem = ({
                 }
             />
             <Input
+                ref={setInputRef(index)}
                 className="flex-1 border-0"
                 value={item.content}
                 type="text"
                 onKeyDown={(e) => onKeyDown(e, item.id)}
-                onChange={(e) => onTextChange(item.id, e.target.value)}
+                onChange={(e) => onTextChange(item.id, e)}
+                placeholder="List Item"
             />
         </div>
     );

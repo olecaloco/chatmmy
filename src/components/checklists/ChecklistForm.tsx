@@ -1,18 +1,11 @@
 import { Checklist, ChecklistItem } from "@/models";
 import { Input } from "../ui/input";
 import { ChecklistFormItem } from "./ChecklistFormItem";
-import {
-    ChangeEvent,
-    FormEvent,
-    KeyboardEvent,
-    useEffect,
-    useRef,
-    useState,
-} from "react";
+import { SubmitEvent, useEffect, useRef, useState } from "react";
 import { useAuthContext } from "@/helpers/authContext";
 import { saveChecklist } from "@/lib/api";
 import { useNavigate } from "@tanstack/react-router";
-import { Plus } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 
 interface FormProps {
     id?: string;
@@ -30,15 +23,33 @@ export const ChecklistForm = ({
     const { user } = useAuthContext();
     const navigate = useNavigate();
     const titleRef = useRef<HTMLInputElement>(null);
-    const [items, setItems] = useState<ChecklistItem[]>([]);
+    const [items, setItems] = useState<ChecklistItem[]>([
+        { id: 1, content: "", checked: false },
+    ]);
+
+    const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
+    const pendingFocusIndex = useRef<number | null>(null);
 
     useEffect(() => {
         if (!checklist) return;
         setItems(checklist.items);
     }, [checklist]);
 
+    useEffect(() => {
+        if (pendingFocusIndex.current !== null) {
+            inputRefs.current[pendingFocusIndex.current]?.focus();
+            pendingFocusIndex.current = null;
+        }
+    }, [items]);
+
+    const setInputRef =
+        (index: number) =>
+        (el: HTMLInputElement | null): void => {
+            inputRefs.current[index] = el;
+        };
+
     const onSubmit = async (
-        event: FormEvent<HTMLFormElement>,
+        event: SubmitEvent<HTMLFormElement>,
     ): Promise<void> => {
         event.preventDefault();
 
@@ -68,40 +79,80 @@ export const ChecklistForm = ({
         }
     };
 
-    const focusLastItem = () => {
-        setTimeout(() => {
-            const itemsWrapperEl = document.getElementById("items")!;
-            const itemsEl =
-                itemsWrapperEl.querySelectorAll("input[type='text']");
-            (itemsEl[itemsEl.length - 1] as HTMLElement).focus();
-        }, 1);
+    const addItem = (index = items.length - 1) => {
+        const updated = [...items];
+        updated.splice(index + 1, 0, {
+            id: items.length,
+            content: "",
+            checked: false,
+        });
+
+        pendingFocusIndex.current = index + 1;
+        setItems(updated);
     };
 
-    const onKeyDown = (event: KeyboardEvent<HTMLInputElement>, id: number) => {
-        if (loading) return;
+    const deleteItem = (index: number) => {
+        if (items.length === 1) return;
 
-        const BYPASS_KEYS = ["Backspace", "Enter"];
+        const updated = items.filter((_, i) => i !== index);
 
-        if (BYPASS_KEYS.includes(event.key)) {
-            if (event.key === "Enter") {
-                event.preventDefault();
-                const textInputs =
-                    document.querySelectorAll("input[type='text']");
-                (textInputs[textInputs.length - 1] as HTMLElement).focus();
-            } else if (event.key === "Backspace") {
-                if (event.currentTarget.value !== "") return;
+        const nextIndex = index > 0 ? index - 1 : 0;
+        pendingFocusIndex.current = nextIndex;
 
-                const updated = items.filter((item) => item.id !== id);
-                setItems(updated);
-                focusLastItem();
+        setItems(updated);
+    };
 
-                if (updated.length === 0) {
-                    const textInputs =
-                        document.querySelectorAll("input[type='text']");
-                    (textInputs[textInputs.length - 1] as HTMLElement).focus();
-                }
+    const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            addItem(index);
+            return;
+        }
+
+        if (e.key === "ArrowDown") {
+            e.preventDefault();
+            const next = index + 1;
+            if (next < items.length) {
+                inputRefs.current[next]?.focus();
             }
         }
+
+        if (e.key === "ArrowUp") {
+            e.preventDefault();
+            const prev = index - 1;
+            if (prev >= 0) {
+                inputRefs.current[prev]?.focus();
+            }
+        }
+
+        if (e.key === "Backspace" && items[index].content === "") {
+            e.preventDefault();
+
+            if (items.length > 1) {
+                deleteItem(index);
+            }
+
+            return;
+        }
+
+        if (e.key === "Delete" && items[index].content === "") {
+            e.preventDefault();
+
+            if (items.length > 1) {
+                const nextIndex = Math.min(index, items.length - 2); // move down if possible
+                pendingFocusIndex.current = nextIndex;
+
+                setItems(items.filter((_, i) => i !== index));
+            }
+
+            return;
+        }
+    };
+
+    const handleChange = (index: number, value: string) => {
+        const updated = [...items];
+        updated[index].content = value;
+        setItems(updated);
     };
 
     const onCheckedChange = async (id: number, checked: boolean) => {
@@ -116,56 +167,6 @@ export const ChecklistForm = ({
         });
 
         setItems(itemsCopy);
-    };
-
-    const onTextChange = (id: number, value: string) => {
-        const current = [...items];
-        const updatedItems = current.map((item) => {
-            if (item.id === id) item.content = value;
-            return item;
-        });
-
-        setItems(updatedItems);
-    };
-
-    const onNewItemChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const { value } = event.currentTarget;
-
-        setItems((items) => {
-            if (items.length > 0) {
-                return [
-                    ...items,
-                    {
-                        id: items[items.length - 1].id + 1,
-                        checked: false,
-                        content: value,
-                    },
-                ];
-            } else {
-                return [
-                    {
-                        id: 1,
-                        checked: false,
-                        content: value,
-                    },
-                ];
-            }
-        });
-
-        focusLastItem();
-
-        event.currentTarget.value = "";
-    };
-
-    const onNewItemKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            return;
-        }
-
-        if (event.key === "Backspace") {
-            focusLastItem();
-        }
     };
 
     return (
@@ -190,27 +191,28 @@ export const ChecklistForm = ({
 
             <div id="wrapper" className="flex-1 overflow-y-auto mb-10">
                 <div id="items">
-                    {items?.map((item) => (
+                    {items?.map((item, index) => (
                         <ChecklistFormItem
+                            setInputRef={setInputRef}
+                            index={index}
                             item={item}
                             key={item.id}
                             onCheckedChange={onCheckedChange}
-                            onTextChange={onTextChange}
-                            onKeyDown={onKeyDown}
+                            onTextChange={(_, e) =>
+                                handleChange(index, e.target.value)
+                            }
+                            onKeyDown={(e) => handleKeyDown(e, index)}
                         />
                     ))}
                 </div>
-
-                <div className="flex items-center space-x-2">
-                    <Plus className="text-muted-foreground" />
-                    <Input
-                        className="px-0 border-0"
-                        type="text"
-                        placeholder="List Item"
-                        onKeyDown={onNewItemKeyDown}
-                        onChange={onNewItemChange}
-                    />
-                </div>
+                <button
+                    className="mt-2 flex items-center gap-1 text-gray-500 text-sm hover:text-white transition cursor-pointer"
+                    onClick={() => addItem()}
+                    type="button"
+                >
+                    <PlusIcon className="w-4" />
+                    Add Item
+                </button>
             </div>
         </form>
     );
