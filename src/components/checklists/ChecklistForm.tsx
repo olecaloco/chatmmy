@@ -82,7 +82,7 @@ export const ChecklistForm = ({
     const addItem = (index = items.length - 1) => {
         const updated = [...items];
         updated.splice(index + 1, 0, {
-            id: items.length,
+            id: items.length + 1,
             content: "",
             checked: false,
         });
