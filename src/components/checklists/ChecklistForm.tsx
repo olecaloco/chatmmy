@@ -80,9 +80,11 @@ export const ChecklistForm = ({
     };
 
     const addItem = (index = items.length - 1) => {
+        const maxId =
+            items.length > 0 ? Math.max(...items.map((item) => item.id)) : 0;
         const updated = [...items];
         updated.splice(index + 1, 0, {
-            id: items.length + 1,
+            id: maxId + 1,
             content: "",
             checked: false,
         });
