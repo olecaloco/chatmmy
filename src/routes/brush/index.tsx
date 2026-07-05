@@ -84,7 +84,7 @@ export function CalendarCustomDays() {
                                     {exists ? (
                                         <img
                                             loading="lazy"
-                                            src="https://cdn.7tv.app/emote/01GB4E5CB0000BJ5HR8F6XV9A0/1x.webp"
+                                            src="https://cdn.7tv.app/emote/01JGNR42G2HMQP0A6ED6K2CDWY/1x.webp"
                                             alt="Complete"
                                             className="w-8"
                                         />
