@@ -1,7 +1,7 @@
 {
   "name": "chatmmy",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -62,6 +62,7 @@
     "workbox-precaching": "^7.3.0"
   },
   "overrides": {
-    "serialize-javascript": "^7.0.5"
+    "serialize-javascript": "^7.0.5",
+    "esbuild": ">=0.28.1"
   }
 }
