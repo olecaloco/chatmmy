@@ -67,11 +67,6 @@ export function CalendarCustomDays() {
             disableNavigation
             showOutsideDays={false}
             className="mx-auto max-w-[450px] w-full [--cell-size:--spacing(10)] md:[--cell-size:--spacing(12)]"
-            formatters={{
-                formatMonthDropdown: (date) => {
-                    return date.toLocaleString("default", { month: "long" });
-                },
-            }}
             components={{
                 DayButton: ({ children, modifiers, day, ...props }) => {
                     const formatted = format(day.date, "yyyy-MM-dd");
@@ -85,7 +80,23 @@ export function CalendarCustomDays() {
                         >
                             {children}
                             {!modifiers.outside && (
-                                <div>{exists ? "✅" : "❌"}</div>
+                                <div>
+                                    {exists ? (
+                                        <img
+                                            loading="lazy"
+                                            src="https://cdn.7tv.app/emote/01GB4E5CB0000BJ5HR8F6XV9A0/1x.webp"
+                                            alt="Complete"
+                                            className="w-8"
+                                        />
+                                    ) : (
+                                        <img
+                                            loading="lazy"
+                                            src="https://cdn.7tv.app/emote/01H6SKVTWR00049XSVR28FKPP6/1x.webp"
+                                            alt="Incomplete"
+                                            className="w-8"
+                                        />
+                                    )}
+                                </div>
                             )}
                         </CalendarDayButton>
                     );
