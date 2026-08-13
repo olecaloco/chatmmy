@@ -20,12 +20,11 @@ export const Route = createFileRoute("/brush/")({
 });
 
 export function CalendarCustomDays() {
+    const [month, setMonth] = useState<string>(format(new Date(), "yyyyMM"));
     const [dates, setDates] = useState<string[]>([]);
-    const now = new Date();
-    const id = format(now, "yyyyMM");
 
     useEffect(() => {
-        const _doc = doc(db, "brush", id);
+        const _doc = doc(db, "brush", month);
 
         const unsub = onSnapshot(_doc, (snapshot) => {
             if (!snapshot.exists()) {
@@ -40,7 +39,7 @@ export function CalendarCustomDays() {
         return () => {
             unsub();
         };
-    }, [id]);
+    }, [month]);
 
     const onSelect = async (selected: any) => {
         const formatted = format(selected, "yyyy-MM-dd");
@@ -48,7 +47,7 @@ export function CalendarCustomDays() {
         if (_dates.has(formatted)) _dates.delete(formatted);
         else _dates.add(formatted);
 
-        const _doc = doc(db, "brush", id);
+        const _doc = doc(db, "brush", month);
 
         await setDoc(
             _doc,
@@ -59,12 +58,16 @@ export function CalendarCustomDays() {
         );
     };
 
+    const onMonthChange = (value: Date) => {
+        setMonth(format(value, "yyyyMM"));
+    };
+
     return (
         <Calendar
             mode="single"
             onSelect={onSelect}
+            onMonthChange={onMonthChange}
             numberOfMonths={1}
-            disableNavigation
             showOutsideDays={false}
             className="mx-auto max-w-[450px] w-full [--cell-size:--spacing(10)] md:[--cell-size:--spacing(12)]"
             components={{
